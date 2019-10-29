@@ -13,7 +13,6 @@ file(GLOB_RECURSE HEADER_FILES
 	${CMAKE_SOURCE_DIR}/include/*.hpp)
 
 message(${HEADER_FILES})
-
 # link_directories(${CMAKE_SOURCE_DIR}/lib)
 
 find_package(OpenGL REQUIRED)
@@ -27,4 +26,5 @@ find_package(Eigen3 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIR})
 
 add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES} )
+target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR})
 target_link_libraries(${PROJECT_NAME} ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES})

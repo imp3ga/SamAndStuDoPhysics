@@ -2,8 +2,7 @@
 #include <cmath>
 #include <iostream>
 
-// #include "planets.h" // ?????
-#include "/media/sf_Documents/Portfolio/openGL/planets/include/planets.h"
+#include "include/planets.h"
 
 planet::planet(double r)
 {
