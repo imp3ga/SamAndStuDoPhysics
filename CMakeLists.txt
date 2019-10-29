@@ -3,14 +3,22 @@ set (CMAKE_CXX_STANDARD 11)
 PROJECT(planets)
 
 
-file(GLOB_RECURSE SOURCE_FILES
-	${CMAKE_SOURCE_DIR}/src/*.cpp)
+# file(GLOB_RECURSE SRC_FILES
+# 	${CMAKE_SOURCE_DIR}/src/*.cpp)
+set(SRC_FILES
+	${CMAKE_SOURCE_DIR}/src/main.cpp
+	${CMAKE_SOURCE_DIR}/src/planet.cpp
+	${CMAKE_SOURCE_DIR}/src/solarSystem.cpp)
 	
-message(${SOURCE_FILES})
+message(${SRC_FILES})
 
-file(GLOB_RECURSE HEADER_FILES 
-	${CMAKE_SOURCE_DIR}/include/*.h
-	${CMAKE_SOURCE_DIR}/include/*.hpp)
+# file(GLOB_RECURSE HEADER_FILES 
+# 	${CMAKE_SOURCE_DIR}/include/*.h
+# 	${CMAKE_SOURCE_DIR}/include/*.hpp)
+set(HEADER_FILES
+	${CMAKE_SOURCE_DIR}/include/main.h
+	${CMAKE_SOURCE_DIR}/include/planet.h
+	${CMAKE_SOURCE_DIR}/include/solarSystem.h)
 
 message(${HEADER_FILES})
 # link_directories(${CMAKE_SOURCE_DIR}/lib)
@@ -25,6 +33,6 @@ include_directories(${GLUT_INCLUDE_DIR})
 find_package(Eigen3 REQUIRED)
 include_directories(${EIGEN3_INCLUDE_DIR})
 
-add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SOURCE_FILES} )
+add_executable(${PROJECT_NAME} ${HEADER_FILES} ${SRC_FILES} )
 target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR})
 target_link_libraries(${PROJECT_NAME} ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES})
