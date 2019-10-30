@@ -6,22 +6,37 @@
 
 #define CONST_PI 3.14159265358979
 
-class planet{
+class AstroObjectBase{
+    protected:
+        Eigen::Vector2d position, velocity;
+        double dMass;
+        
     public:
-        planet(const double r, const Eigen::Vector2d v);
-        void setRadius(const double r);
         void setMass(const double m);
         void setPosition(const Eigen::Vector2d s);
         void setVelocity(const Eigen::Vector2d v);
 
-        double getRadius(){return dRadius;};
+        double getMass();
+        Eigen::Vector2d getPosition();
+        Eigen::Vector2d getVelocity();
+};
+
+class planet : public AstroObjectBase{
+    public:
+        planet(const double r, const Eigen::Vector2d v);
+
+        void setMass(const double m);
+        void setPosition(const Eigen::Vector2d s);
+        void setVelocity(const Eigen::Vector2d v);
+        void setRadius(const double r);
+
         double getMass(){return dMass;};
         Eigen::Vector2d getPosition(){return position;};
         Eigen::Vector2d getVelocity(){return velocity;};
+        double getRadius(){return dRadius;};
 
     private:
-        double dRadius, dMass;
-        Eigen::Vector2d position, velocity;
+        double dRadius;
 };
 
 typedef std::chrono::high_resolution_clock Clock;
