@@ -8,7 +8,7 @@
 
 class planet{
     public:
-        planet(const double r);
+        planet(const double r, const Eigen::Vector2d v);
         void setRadius(const double r);
         void setMass(const double m);
         void setPosition(const Eigen::Vector2d s);

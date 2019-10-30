@@ -3,10 +3,11 @@
 
 #include "include/planets.h"
 
-planet::planet(const double r)
+planet::planet(const double r, const Eigen::Vector2d v)
 {
     setRadius(r);
     setMass(r * r * _dMassDensity);
+    setVelocity(v);
 }
 
 void planet::setRadius(const double r)
@@ -85,12 +86,14 @@ void physicsLoop(int val){
             {
                 double newMass = p0Mass + p1Mass;
                 double newRadius = sqrt(newMass / _dMassDensity);       // Preferably remove this sqrt somehow
-                planet pNew(newRadius);
-                pNew.setPosition(p0Mass > p1Mass ? p0Pos : p1Pos);
+                
                 Eigen::Vector2d p0Vel = p0.getVelocity();
                 Eigen::Vector2d p1Vel = p1.getVelocity();
                 Eigen::Vector2d newVel = (p0Mass * p0Vel + p1Mass * p1Vel) / newMass;
-                pNew.setVelocity(newVel);
+                
+                planet pNew(newRadius, newVel);
+                pNew.setPosition(p0Mass > p1Mass ? p0Pos : p1Pos);
+               
                 newPlanets.push_back(pNew);
                 _solarSystem[i].setMass(-1.0); _solarSystem[j].setMass(-1.0);
                 continue;
@@ -148,19 +151,18 @@ void mouseHandler(int button, int state, int x, int y)
         double t = std::chrono::duration_cast<std::chrono::nanoseconds>(Clock::now() - _initTime).count()  / 1E9;
         Eigen::Vector2d v = 2.0 * mouseDisp / t;
     
-        planet newPlanet(500.0 * t * t);
+        planet newPlanet(500.0 * t * t, v);
         newPlanet.setPosition(pos);
-        newPlanet.setVelocity(v);
+
         _solarSystem.push_back(newPlanet);
     }
   }
 }
 
 int main(int argc, char **argv){
-    // Add the initial large planet
-    planet initPlanet(50);
+    // Add the initial large planet 
+    planet initPlanet(50, Eigen::Vector2d(0.,0.));
     initPlanet.setPosition(Eigen::Vector2d(0., 0.));
-    initPlanet.setVelocity(Eigen::Vector2d(0.,0.));
     _solarSystem.push_back(initPlanet);
 
     // openGL initialization
