@@ -15,6 +15,7 @@ class planet
         double getMass(){return dMass;};
         Eigen::Vector2d getPosition(){return position;};
         Eigen::Vector2d getVelocity(){return velocity;};
+        bool _bNeedUpdate = false;
 
     private:
         double dRadius, dMass;

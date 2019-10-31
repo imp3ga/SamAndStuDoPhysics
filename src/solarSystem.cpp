@@ -55,12 +55,16 @@ void solarSystem::update()
     for (int i = 0; i < _nPlanets; ++i)
     {
         planet &p0 = _vecPlanets[i];
-        Eigen::Vector2d p0Pos = p0.getPosition();
-        double p0Mass = p0.getMass();
-        if(p0Mass < 0)
+        if (p0._bNeedUpdate)
         {
             continue;
         }
+        Eigen::Vector2d p0Pos = p0.getPosition();
+        double p0Mass = p0.getMass();
+        // if(p0Mass < 0)
+        // {
+        //     continue;
+        // }
         totalMag += p0.getVelocity() * p0Mass;
 
         Eigen::Vector2d force(0., 0.);
@@ -73,10 +77,14 @@ void solarSystem::update()
             planet &p1 = _vecPlanets[j];
             Eigen::Vector2d p1Pos = p1.getPosition();
             double p1Mass = p1.getMass();
-            if(p1Mass < 0.)
-            { 
+            if (p1._bNeedUpdate)
+            {
                 continue;
             }
+            // if(p1Mass < 0.)
+            // { 
+            //     continue;
+            // }
             // Check for collisions
             double dist = (p1Pos - p0Pos).norm();
             if (dist < p0.getRadius() + p1.getRadius())
@@ -88,17 +96,29 @@ void solarSystem::update()
                 if(true)//dDot > 0.0)
                 {
                     // Bounce
+                    // Get momentum component in direction of collision
+                    Eigen::Vector2d p0NewVel = ((p0Mass - p1Mass) / (p0Mass + p1Mass))*p0Vel
+                                             + (2*p1Mass / (p0Mass + p1Mass))* p1Vel;
+
                     Eigen::Vector2d p1NewVel = (2*p0Mass / (p0Mass + p1Mass))*p0Vel
                                              - ((p0Mass - p1Mass) / (p0Mass + p1Mass))*p1Vel;
 
-                    Eigen::Vector2d p0NewVel = ((p0Mass - p1Mass) / (p0Mass + p1Mass))*p0Vel
-                                             + (2*p1Mass / (p0Mass + p1Mass))*p1Vel;
-                                            
+                    // Rotate to account for glance
+                    // Get vector between planet centres
+                    Eigen::Vector2d relDisP0P1 = (p1Pos - p0Pos).normalized();
+                    Eigen::Vector2d relDisP1P0 = - relDisP0P1;
+                    // Reflect
+                    Eigen::Vector2d reflection0 = (p0Vel - 2 * (p0Vel.dot(relDisP1P0))*relDisP1P0).normalized();
+                    Eigen::Vector2d reflection1 = (p1Vel - 2 * (p1Vel.dot(relDisP0P1))*relDisP0P1).normalized();
+
+                    p0NewVel = reflection0 * p0NewVel.norm();
+                    p1NewVel = reflection1 * p1NewVel.norm(); 
+
                     _vecPlanets[i].setVelocity(p0NewVel);
                     _vecPlanets[j].setVelocity(p1NewVel);
-                    // Update position to avoid repeated collisions
-                    _vecPlanets[i].setPosition(p0Pos + (0.001 * p0NewVel));
-                    _vecPlanets[j].setPosition(p1Pos + (0.001 * p1NewVel));
+
+                    _vecPlanets[i]._bNeedUpdate = true;
+                    _vecPlanets[j]._bNeedUpdate = true;
                     continue;
                 }
                 else
@@ -146,5 +166,6 @@ void solarSystem::update()
         // Update position
         Eigen::Vector2d newPos = planet.getPosition() + (0.001 * newVel);   // Physics update is 1ms
         planet.setPosition(newPos);
+        planet._bNeedUpdate = false;
     }
 }
