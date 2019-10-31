@@ -57,7 +57,14 @@ void keyHandler(unsigned char key, int x, int y)
 {
     if(key == 'r')
     {
+        // reset
         _solarSystem.reset();
+    }
+    else if(key == 'c')
+    {   
+        // centre
+        _solarSystem.centre();
+        // std::cout << "(" << x << ", " << y << ")\n";
     }
     // else if(key == ' ')
     // {

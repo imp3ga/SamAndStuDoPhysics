@@ -8,7 +8,9 @@ class solarSystem
         solarSystem(double rho) ;
         void init(double initPlanetRad);
         void reset();
+        void centre();
         void addPlanet(Eigen::Vector2d pos, Eigen::Vector2d vel, double r);
+        void addCustomPlanet(Eigen::Vector2d pos, Eigen::Vector2d vel, double r, double rho, bool fixed);
         void update(void);
         void getInfo(std::vector<Eigen::Vector2d> &allCentres,
                             std::vector<double> &allRadii);

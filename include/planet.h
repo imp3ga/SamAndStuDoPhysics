@@ -5,7 +5,7 @@
 class planet
 {
     public:
-        planet(const double r, const double rho);
+        planet(const double r, const double rho, bool fixed);
         void setRadius(const double r);
         void setMass(const double m);
         void setPosition(const Eigen::Vector2d s);
@@ -16,6 +16,7 @@ class planet
         Eigen::Vector2d getPosition(){return position;};
         Eigen::Vector2d getVelocity(){return velocity;};
         bool _bNeedUpdate = false;
+        bool _bFixed = false;
 
     private:
         double dRadius, dMass;
