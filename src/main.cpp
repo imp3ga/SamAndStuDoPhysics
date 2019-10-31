@@ -14,7 +14,7 @@ void display(){
     for(int i = 0; i < allCentres.size(); ++i)
     {
         glBegin(GL_POLYGON);
-        for(float arc = 0; arc < 2 * CONST_PI; arc += 0.5){
+        for(float arc = 0; arc < 2 * CONST_PI; arc += 0.1){
             glVertex2f(allRadii[i]*(cos(arc)) + allCentres[i][0], allRadii[i]*(sin(arc)) + allCentres[i][1]);
         }
         glEnd();
@@ -32,7 +32,7 @@ void physicsLoop(int val){
 void mouseHandler(int button, int state, int x, int y) 
 {
     x -= _dHalfWindowWidth;
-    y -= _dHalfWindowHeight;
+    y = - (y - _dHalfWindowHeight);
 
   if (state == GLUT_DOWN) {
     if (button == GLUT_LEFT_BUTTON) {
@@ -53,6 +53,18 @@ void mouseHandler(int button, int state, int x, int y)
   }
 }
 
+void keyHandler(unsigned char key, int x, int y)
+{
+    if(key == 'r')
+    {
+        _solarSystem.reset();
+    }
+    // else if(key == ' ')
+    // {
+    //     std::cout << "(" << x << ", " << y << ")\n";
+    // }
+}
+
 int main(int argc, char **argv){
     _solarSystem.init(50.0);
 
@@ -63,9 +75,10 @@ int main(int argc, char **argv){
     glutInitWindowPosition((glutGet(GLUT_SCREEN_WIDTH)- _dHalfWindowWidth * 2.0)/2,
                         (glutGet(GLUT_SCREEN_HEIGHT)- _dHalfWindowHeight * 2.0)/2);
     glutCreateWindow("Planets");
-    glOrtho(-_dHalfWindowWidth, _dHalfWindowWidth, _dHalfWindowHeight, -_dHalfWindowHeight, 0, 1);
+    glOrtho(-_dHalfWindowWidth, _dHalfWindowWidth, -_dHalfWindowHeight, _dHalfWindowHeight, 0, 1);
     glutDisplayFunc(display);
     glutMouseFunc(mouseHandler);
+    glutKeyboardFunc(keyHandler);
     physicsLoop(0);
 
     glutMainLoop();
