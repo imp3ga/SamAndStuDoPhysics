@@ -4,13 +4,10 @@ planet::planet(const double r, const double rho, bool fixed)
 {
     setRadius(r);
     setMass(r * r * rho);
-    _bFixed = fixed;
+    setFixed(fixed);
 }
 
 void planet::setRadius(const double r)
 {
     dRadius = r;
 }
-
-
-

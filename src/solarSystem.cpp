@@ -80,7 +80,7 @@ void solarSystem::update()
     for (int i = 0; i < _nPlanets; ++i)
     {
         planet &p0 = _vecPlanets[i];
-        if (p0._bNeedUpdate)
+        if (p0.needsUpdate())
         {
             continue;
         }
@@ -102,7 +102,7 @@ void solarSystem::update()
             planet &p1 = _vecPlanets[j];
             Eigen::Vector2d p1Pos = p1.getPosition();
             double p1Mass = p1.getMass();
-            if (p1._bNeedUpdate)
+            if (p1.needsUpdate())
             {
                 continue;
             }
@@ -117,16 +117,19 @@ void solarSystem::update()
                 // Check for bounce or absorb
                 Eigen::Vector2d p0Vel = p0.getVelocity();
                 Eigen::Vector2d p1Vel = p1.getVelocity();
-                double dDot = p0Vel.dot(p1Vel);
-                if(true)//dDot > 0.0)
+                double dDot = p0Vel.normalized().dot(p1Vel.normalized());
+                // std::cout << dDot << "\n";
+                if(true)
                 {
                     // Bounce
+                    // std::cout << "bouncing...\n";
+                    Eigen::Vector2d p0p1Displacement = (p0Pos - p1Pos).normalized();
+                    Eigen::Vector2d p1p0Displacement = - p0p1Displacement;
 
                     Eigen::Vector2d p0NewVel = p0Vel - (2.*p1Mass/(p0Mass+p1Mass)) *
-                    (p0Vel - p1Vel).dot(p0Pos - p1Pos) * (p0Pos - p1Pos) / (p0Pos - p1Pos).squaredNorm();
-
+                    (p0Vel - p1Vel).dot(p0p1Displacement) * p0p1Displacement;
                     Eigen::Vector2d p1NewVel = p1Vel - (2.*p0Mass/(p0Mass+p1Mass)) *
-                    (p1Vel - p0Vel).dot(p1Pos - p0Pos) * (p1Pos - p0Pos) / (p1Pos - p0Pos).squaredNorm();
+                    (p1Vel - p0Vel).dot(p1p0Displacement) * p1p0Displacement;
 
                     // double dKE_before = 0.5 * (p0Mass*p0Vel.squaredNorm() + p1Mass*p1Vel.squaredNorm());
                     // double dKE_after = 0.5 * (p0Mass*p0NewVel.squaredNorm() + p1Mass*p1NewVel.squaredNorm());
@@ -135,8 +138,8 @@ void solarSystem::update()
                     _vecPlanets[i].setVelocity(p0NewVel);
                     _vecPlanets[j].setVelocity(p1NewVel);
 
-                    _vecPlanets[i]._bNeedUpdate = true;
-                    _vecPlanets[j]._bNeedUpdate = true;
+                    _vecPlanets[i].setNeedsUpdate(true);
+                    _vecPlanets[j].setNeedsUpdate(true);
                     continue;
                 }
                 else
@@ -176,7 +179,7 @@ void solarSystem::update()
     for (int i = 0; i < _vecPlanets.size(); ++i)
     {
         planet &planet = _vecPlanets[i];
-        if(!planet._bFixed)
+        if(!planet.isFixed())
         {
             // Update velocity
             double mass = planet.getMass();
@@ -186,7 +189,7 @@ void solarSystem::update()
             // Update position
             Eigen::Vector2d newPos = planet.getPosition() + (0.001 * newVel);   // Physics update is 1ms
             planet.setPosition(newPos);
-            planet._bNeedUpdate = false;
+            planet.setNeedsUpdate(false);
         }
     }
 }

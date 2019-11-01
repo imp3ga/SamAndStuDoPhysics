@@ -3,17 +3,27 @@
 
 void AstroObjectBase::setMass(const double m)
 {
-    dMass = m;
+    _dMass = m;
 }
 
 void AstroObjectBase::setPosition(const Eigen::Vector2d s)
 {
-    position = s;
+    _position = s;
 }
 
 void AstroObjectBase::setVelocity(const Eigen::Vector2d v)
 {
-    velocity = v;
+    _velocity = v;
+}
+
+void AstroObjectBase::setFixed(bool bFixed)
+{
+    _bFixed = bFixed;
+}
+
+void AstroObjectBase::setNeedsUpdate(bool bUpdate)
+{
+    _bNeedUpdate = bUpdate;
 }
 
 

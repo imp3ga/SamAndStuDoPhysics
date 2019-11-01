@@ -14,7 +14,7 @@ void display(){
     for(int i = 0; i < allCentres.size(); ++i)
     {
         glBegin(GL_POLYGON);
-        for(float arc = 0; arc < 2 * CONST_PI; arc += 0.1){
+        for(float arc = 0; arc < 2 * CONST_PI; arc += 0.5){
             glVertex2f(allRadii[i]*(cos(arc)) + allCentres[i][0], allRadii[i]*(sin(arc)) + allCentres[i][1]);
         }
         glEnd();
