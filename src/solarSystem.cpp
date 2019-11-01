@@ -120,79 +120,28 @@ void solarSystem::update()
                 double dDot = p0Vel.dot(p1Vel);
                 if(true)//dDot > 0.0)
                 {
-                    // Get vector between planet centres
+                    // Bounce
+                    // Find incidence line
                     Eigen::Vector2d relDisP0P1 = (p1Pos - p0Pos).normalized();
                     Eigen::Vector2d relDisP1P0 = - relDisP0P1;
 
-                    // Momentum
-                    Eigen::Vector2d p0Momentum = p0Mass * p0Vel;
-                    Eigen::Vector2d p1Momentum = p1Mass * p1Vel;
+                    // Reflect velocity along incidence
+                    Eigen::Vector2d p0NewVector = p0Vel.normalized() - (2*p0Vel.normalized().dot(relDisP0P1))*relDisP0P1;
+                    Eigen::Vector2d p1NewVector = p1Vel.normalized() - (2*p1Vel.normalized().dot(relDisP0P1))*relDisP0P1;
 
-                    // Eigen::Vector2d p0MomentumColComp = relDisP0P1;
-                    // Eigen::Vector2d p1MomentumColComp = relDisP1P0;
-                    Eigen::Vector2d p0MomentumColComp = relDisP0P1 * p0Momentum.norm();// * p0Momentum.normalized().dot(relDisP0P1.normalized());
-                    Eigen::Vector2d p1MomentumColComp = (-relDisP0P1) * p1Momentum.norm();// * p1Momentum.normalized().dot((-relDisP0P1).normalized());
-                    
-                    Eigen::Vector2d p0NewMomentum = p0Momentum - p0MomentumColComp + p1MomentumColComp;
-                    Eigen::Vector2d p1NewMomentum = p1Momentum - p1MomentumColComp + p0MomentumColComp;
+                    Eigen::Vector2d p0NewVel = p0NewVector / p0Mass;        // Why need a mass factor?
+                    Eigen::Vector2d p1NewVel = p1NewVector / p1Mass;
 
-                    Eigen::Vector2d p0NewVel = p0NewMomentum / p0Mass;
-                    Eigen::Vector2d p1NewVel = p1NewMomentum / p1Mass;
-                    // KE consideration
+                    // Find magnitude of vectors using KE conservation
                     double dKE_before = 0.5 * (p0Mass*p0Vel.squaredNorm() + p1Mass*p1Vel.squaredNorm());
                     double dKE_after = 0.5 * (p0Mass*p0NewVel.squaredNorm() + p1Mass*p1NewVel.squaredNorm());
-                    // std::cout << "KE before: " << dKE_before << ", KE after: " << dKE_after;
+                    std::cout << "KE before: " << dKE_before << ", KE after: " << dKE_after;
                     double dConserveFactor = dKE_before / dKE_after;
 
                     p0NewVel = p0NewVel * sqrt(dConserveFactor);
                     p1NewVel = p1NewVel * sqrt(dConserveFactor);
                     dKE_after = 0.5 * (p0Mass*p0NewVel.squaredNorm() + p1Mass*p1NewVel.squaredNorm());
-                    // std::cout << ", KE after correction: " << dKE_after << ", dConserveFactor: " << dConserveFactor << "\n\n";
-
-                    // Eigen::Vector2d p0MomentumColComp = relDisP0P1 * p0Momentum.norm() * p0Momentum.normalized().dot(relDisP0P1.normalized());
-                    // Eigen::Vector2d p1MomentumColComp = (-relDisP0P1) * p1Momentum.norm() * p1Momentum.normalized().dot((-relDisP0P1).normalized());
-                    
-                    // Eigen::Vector2d p0MomentumColComp = relDisP0P1 * p0Momentum.dot(relDisP0P1);
-                    // Eigen::Vector2d p1MomentumColComp = (-relDisP0P1) * p1Momentum.dot(-relDisP0P1);
-
-
-                    // Eigen::Vector2d p0MomentumColComp = (p0Momentum) * (p0Vel.normalized()).dot(relDisP0P1);
-                    // Eigen::Vector2d p1MomentumColComp = (p1Momentum) * (p1Vel.normalized()).dot(relDisP0P1);
-                    // Subtract from original momentum vectors
-                    // Eigen::Vector2d p0NewMomentum = p0Momentum - p0MomentumColComp + p1MomentumColComp;
-                    // Eigen::Vector2d p1NewMomentum = p1Momentum - p1MomentumColComp + p0MomentumColComp;
-
-                    // Conservation of momentum
-                    // p0Momentum + p1Momentum = p0NewMomentum + p1NewMomentum
-                    //                         = p0Momentum - p0MomentumColComp + p1MomentumColComp + p1Momentum - p1MomentumColComp + p0MomentumColComp
-                    //                         = p0Momentum + p1Momentum
-
-                    // std::cout << "Total momentum before: " << (p0Momentum + p1Momentum).transpose()
-                    //         << ",   Total momentum after: " << (p0NewMomentum + p1NewMomentum).transpose() << "\n";
-                    //         std::cout << "Momentum magnitude change of collision: " << (p0Momentum + p1Momentum).norm() - (p0NewMomentum + p1NewMomentum).norm() << "\n\n\n";
-                    // Calculate new velocities and set
-                    // Eigen::Vector2d p0NewVel = p0NewMomentum / p0Mass;
-                    // Eigen::Vector2d p1NewVel = p1NewMomentum / p1Mass;
-
-
-                    // // Bounce
-                    // // Get momentum component in direction of collision
-                    // Eigen::Vector2d p0NewVel = ((p0Mass - p1Mass) / (p0Mass + p1Mass))*p0Vel
-                    //                          + (2*p1Mass / (p0Mass + p1Mass))* p1Vel;
-
-                    // Eigen::Vector2d p1NewVel = (2*p0Mass / (p0Mass + p1Mass))*p0Vel
-                    //                          - ((p0Mass - p1Mass) / (p0Mass + p1Mass))*p1Vel;
-
-                    // // Rotate to account for glance
-                    // // Get vector between planet centres
-                    // Eigen::Vector2d relDisP0P1 = (p1Pos - p0Pos).normalized();
-                    // Eigen::Vector2d relDisP1P0 = - relDisP0P1;
-                    // // Reflect
-                    // Eigen::Vector2d reflection0 = (p0Vel - 2 * (p0Vel.dot(relDisP1P0))*relDisP1P0).normalized();
-                    // Eigen::Vector2d reflection1 = (p1Vel - 2 * (p1Vel.dot(relDisP0P1))*relDisP0P1).normalized();
-
-                    // p0NewVel = reflection0 * p0NewVel.norm();
-                    // p1NewVel = reflection1 * p1NewVel.norm(); 
+                    std::cout << ", KE after correction: " << dKE_after << ", dConserveFactor: " << dConserveFactor << "\n\n";
 
                     _vecPlanets[i].setVelocity(p0NewVel);
                     _vecPlanets[j].setVelocity(p1NewVel);
