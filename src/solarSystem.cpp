@@ -119,7 +119,10 @@ void solarSystem::update()
                 Eigen::Vector2d p1Vel = p1.getVelocity();
                 double dDot = p0Vel.normalized().dot(p1Vel.normalized());
                 // std::cout << dDot << "\n";
-                if(true)
+
+                 
+
+                if(std::abs((p0.getVelocity() - p1.getVelocity()).norm()) > 5)
                 {
                     // Bounce
                     // std::cout << "bouncing...\n";
@@ -135,8 +138,8 @@ void solarSystem::update()
                     // double dKE_after = 0.5 * (p0Mass*p0NewVel.squaredNorm() + p1Mass*p1NewVel.squaredNorm());
                     // std::cout << "KE before: " << dKE_before << ", KE after: " << dKE_after;
 
-                    _vecPlanets[i].setVelocity(p0NewVel);
-                    _vecPlanets[j].setVelocity(p1NewVel);
+                    _vecPlanets[i].setVelocity(p0NewVel * dampingFactor());
+                    _vecPlanets[j].setVelocity(p1NewVel * dampingFactor());
 
                     _vecPlanets[i].setNeedsUpdate(true);
                     _vecPlanets[j].setNeedsUpdate(true);
@@ -180,7 +183,7 @@ void solarSystem::update()
     {
         planet &planet = _vecPlanets[i];
         if(!planet.isFixed())
-        {
+        {   
             // Update velocity
             double mass = planet.getMass();
             Eigen::Vector2d acc = aForces[i] / mass;

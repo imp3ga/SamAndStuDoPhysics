@@ -14,8 +14,10 @@ class solarSystem
         void update(void);
         void getInfo(std::vector<Eigen::Vector2d> &allCentres,
                             std::vector<double> &allRadii);
+        double dampingFactor(){return _dampingFactor;};
+
     private:
         int _nPlanets = 0;
-        double _dMassDensity, _initPlanetRad;
+        double _dMassDensity, _initPlanetRad, _dampingFactor = 0.95;
         std::vector<planet> _vecPlanets;
 };
