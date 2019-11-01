@@ -121,27 +121,16 @@ void solarSystem::update()
                 if(true)//dDot > 0.0)
                 {
                     // Bounce
-                    // Find incidence line
-                    Eigen::Vector2d relDisP0P1 = (p1Pos - p0Pos).normalized();
-                    Eigen::Vector2d relDisP1P0 = - relDisP0P1;
 
-                    // Reflect velocity along incidence
-                    Eigen::Vector2d p0NewVector = p0Vel.normalized() - (2*p0Vel.normalized().dot(relDisP0P1))*relDisP0P1;
-                    Eigen::Vector2d p1NewVector = p1Vel.normalized() - (2*p1Vel.normalized().dot(relDisP0P1))*relDisP0P1;
+                    Eigen::Vector2d p0NewVel = p0Vel - (2.*p1Mass/(p0Mass+p1Mass)) *
+                    (p0Vel - p1Vel).dot(p0Pos - p1Pos) * (p0Pos - p1Pos) / (p0Pos - p1Pos).squaredNorm();
 
-                    Eigen::Vector2d p0NewVel = p0NewVector / p0Mass;        // Why need a mass factor?
-                    Eigen::Vector2d p1NewVel = p1NewVector / p1Mass;
+                    Eigen::Vector2d p1NewVel = p1Vel - (2.*p0Mass/(p0Mass+p1Mass)) *
+                    (p1Vel - p0Vel).dot(p1Pos - p0Pos) * (p1Pos - p0Pos) / (p1Pos - p0Pos).squaredNorm();
 
-                    // Find magnitude of vectors using KE conservation
-                    double dKE_before = 0.5 * (p0Mass*p0Vel.squaredNorm() + p1Mass*p1Vel.squaredNorm());
-                    double dKE_after = 0.5 * (p0Mass*p0NewVel.squaredNorm() + p1Mass*p1NewVel.squaredNorm());
-                    std::cout << "KE before: " << dKE_before << ", KE after: " << dKE_after;
-                    double dConserveFactor = dKE_before / dKE_after;
-
-                    p0NewVel = p0NewVel * sqrt(dConserveFactor);
-                    p1NewVel = p1NewVel * sqrt(dConserveFactor);
-                    dKE_after = 0.5 * (p0Mass*p0NewVel.squaredNorm() + p1Mass*p1NewVel.squaredNorm());
-                    std::cout << ", KE after correction: " << dKE_after << ", dConserveFactor: " << dConserveFactor << "\n\n";
+                    // double dKE_before = 0.5 * (p0Mass*p0Vel.squaredNorm() + p1Mass*p1Vel.squaredNorm());
+                    // double dKE_after = 0.5 * (p0Mass*p0NewVel.squaredNorm() + p1Mass*p1NewVel.squaredNorm());
+                    // std::cout << "KE before: " << dKE_before << ", KE after: " << dKE_after;
 
                     _vecPlanets[i].setVelocity(p0NewVel);
                     _vecPlanets[j].setVelocity(p1NewVel);
