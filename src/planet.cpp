@@ -9,5 +9,5 @@ planet::planet(const double r, const double rho, bool fixed)
 
 void planet::setRadius(const double r)
 {
-    dRadius = r;
+    _dRadius = r;
 }
