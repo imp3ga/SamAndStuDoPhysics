@@ -1,7 +1,5 @@
 #include <Eigen/Core>
 
-#define CONST_PI 3.14159265358979
-
 class AstroObjectBase 
 {
     public:
@@ -12,10 +10,13 @@ class AstroObjectBase
         void setNeedsUpdate(bool bUpdate);
 
         double getMass(){return _dMass;};
+        double getKE(){return 0.5 * _dMass * _velocity.squaredNorm();}
         Eigen::Vector2d getPosition(){return _position;};
         Eigen::Vector2d getVelocity(){return _velocity;};
         bool needsUpdate(){return _bNeedUpdate;};
         bool isFixed(){return _bFixed;};
+        
+        std::pair<Eigen::Vector2d,Eigen::Vector2d> collisionResult(AstroObjectBase obj);
 
     protected:
         double  _dMass;

@@ -120,26 +120,19 @@ void solarSystem::update()
                 double dDot = p0Vel.normalized().dot(p1Vel.normalized());
                 // std::cout << dDot << "\n";
 
-                 
-
-                if(std::abs((p0.getVelocity() - p1.getVelocity()).norm()) > 5)
+                if(true)
                 {
                     // Bounce
                     // std::cout << "bouncing...\n";
-                    Eigen::Vector2d p0p1Displacement = (p0Pos - p1Pos).normalized();
-                    Eigen::Vector2d p1p0Displacement = - p0p1Displacement;
-
-                    Eigen::Vector2d p0NewVel = p0Vel - (2.*p1Mass/(p0Mass+p1Mass)) *
-                    (p0Vel - p1Vel).dot(p0p1Displacement) * p0p1Displacement;
-                    Eigen::Vector2d p1NewVel = p1Vel - (2.*p0Mass/(p0Mass+p1Mass)) *
-                    (p1Vel - p0Vel).dot(p1p0Displacement) * p1p0Displacement;
+                                       
+                    std::pair<Eigen::Vector2d, Eigen::Vector2d> collisionResult = p0.collisionResult(p1);
 
                     // double dKE_before = 0.5 * (p0Mass*p0Vel.squaredNorm() + p1Mass*p1Vel.squaredNorm());
                     // double dKE_after = 0.5 * (p0Mass*p0NewVel.squaredNorm() + p1Mass*p1NewVel.squaredNorm());
                     // std::cout << "KE before: " << dKE_before << ", KE after: " << dKE_after;
 
-                    _vecPlanets[i].setVelocity(p0NewVel * dampingFactor());
-                    _vecPlanets[j].setVelocity(p1NewVel * dampingFactor());
+                    _vecPlanets[i].setVelocity(collisionResult.first * dampingFactor());
+                    _vecPlanets[j].setVelocity(collisionResult.second * dampingFactor());
 
                     _vecPlanets[i].setNeedsUpdate(true);
                     _vecPlanets[j].setNeedsUpdate(true);
