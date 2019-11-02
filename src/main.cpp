@@ -72,7 +72,8 @@ void keyHandler(unsigned char key, int x, int y)
     // }
 }
 
-int main(int argc, char **argv){
+
+void runSolarSystem(int argc, char **argv){
     _solarSystem.init(50.0);
 
     // openGL initialization
@@ -89,7 +90,25 @@ int main(int argc, char **argv){
     physicsLoop(0);
 
     glutMainLoop();
-   
+}
+
+int main(int argc, char **argv){
+
+    std::cout << argv[1];
+
+    if(argc > 1){
+        
+        std::string argString = argv[1];
+        
+        if(argString == "tests"){
+            UnitTest::RunRests();
+        }
+
+    }
+    else{
+        runSolarSystem(argc, argv);
+    }
+
     return 0;
 }
 

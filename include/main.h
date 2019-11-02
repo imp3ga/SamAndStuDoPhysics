@@ -1,4 +1,5 @@
 #include "include/solarSystem.h"
+#include "include/tests.h"
 
 #include <vector>
 #include <ctime>
