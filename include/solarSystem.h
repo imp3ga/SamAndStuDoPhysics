@@ -25,4 +25,5 @@ class solarSystem
         void updatePositionVelocity();
         bool checkCollisions();
         void resolveCollisions();
+        void resolveRisidualCollisions();
 };

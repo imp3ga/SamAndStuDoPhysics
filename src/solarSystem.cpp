@@ -9,9 +9,14 @@ solarSystem::solarSystem(double rho)
 void solarSystem::init(double initPlanetRad)
 {
     // Add the initial large planet
+
+    // Causes the sticking inside thing:
+    // addPlanet(Eigen::Vector2d(0.,0.), Eigen::Vector2d(0.,0.), 100.);
+    // addPlanet(Eigen::Vector2d(-200.,125.), Eigen::Vector2d(10000.,0.), 20.);
+    // addPlanet(Eigen::Vector2d(200.,140.), Eigen::Vector2d(-10000.,0.), 20.);
+
     addPlanet(Eigen::Vector2d(0.,0.), Eigen::Vector2d(0.,0.), 100.);
-    addPlanet(Eigen::Vector2d(-200.,125.), Eigen::Vector2d(10000.,0.), 20.);
-    addPlanet(Eigen::Vector2d(200.,140.), Eigen::Vector2d(-10000.,0.), 20.);
+    // addPlanet(Eigen::Vector2d(200.,500.), Eigen::Vector2d(0., 0.), 20.);
     // addCustomPlanet(Eigen::Vector2d(0.,0.), Eigen::Vector2d(0.,0.), initPlanetRad, 10000.0, false);
     _initPlanetRad = initPlanetRad;
 }
@@ -234,6 +239,7 @@ void solarSystem::resolveCollisions()
                 }
                 if(!bThree)
                 {
+                    // std::cout << "Two body collision!\n";
                     planet &p1 = _vecPlanets[vCollisions[0]];
                     Eigen::Vector2d p0NewVel, p1NewVel;
                     twoBodyCollision(p0, p1, p0NewVel, p1NewVel);
@@ -247,18 +253,18 @@ void solarSystem::resolveCollisions()
                     _vecPlanets[i]._vecCurrentCollisions.clear();
                     _vecPlanets[vCollisions[0]]._vecCurrentCollisions.clear();
 
-                    // if((p0.getVelocity() + p0NewVel).norm() > 10000.0)
-                    // {
-                    //     p0.setVelocity(p0NewVel);
-                    //     std::cout << "Breaking planet " << i << std::endl;
-                    //     breakPlanet(p0);
-                    // }
-                    // if((p1.getVelocity() + p1NewVel).norm() > 10000.0)
-                    // {
-                    //     std::cout << "Breaking planet " << vCollisions[0] << std::endl;
-                    //     p1.setVelocity(p1NewVel);
-                    //     breakPlanet(p1);
-                    // }
+                    if((p0.getVelocity() + p0NewVel).norm() > 10000.0)
+                    {
+                        p0.setVelocity(p0NewVel);
+                        std::cout << "Breaking planet " << i << std::endl;
+                        breakPlanet(p0);
+                    }
+                    if((p1.getVelocity() + p1NewVel).norm() > 10000.0)
+                    {
+                        std::cout << "Breaking planet " << vCollisions[0] << std::endl;
+                        p1.setVelocity(p1NewVel);
+                        breakPlanet(p1);
+                    }
                 }
             }
 
@@ -334,6 +340,20 @@ void solarSystem::resolveCollisions()
     // _nPlanets = _vecPlanets.size();
 }
 
+void solarSystem::resolveRisidualCollisions()
+{
+    for (int i = 0; i < _nPlanets; ++i)
+    {
+        planet &p0 = _vecPlanets[i];
+        std::vector<int> &vCollisions = p0._vecCurrentCollisions;
+        if(vCollisions.size() > 0)
+        {      
+            p0.revertPosition();
+        }
+    }
+    resolveCollisions();
+}
+
 void solarSystem::twoBodyCollision(planet p0, planet p1, Eigen::Vector2d &p0NewVel, Eigen::Vector2d &p1NewVel)
 {
     Eigen::Vector2d p0Pos = p0.getPosition();
@@ -354,16 +374,14 @@ void solarSystem::twoBodyCollision(planet p0, planet p1, Eigen::Vector2d &p0NewV
 
 void solarSystem::update()
 {
-    bool bRv = checkCollisions();
-    if(bRv)
-    {
-        std::cout << "Some collisions were not resolved!! Closing program.\n";
-        exit(0);
-    }
+    checkCollisions();
     resolveCollisions();
     updatePositionVelocity();
-    bRv = checkCollisions();
-
+    while(checkCollisions())
+    {
+        std::cout << "Some collisions were not resolved!! Resolving risidual collisions...\n";
+        resolveRisidualCollisions();
+    }
 }
 
 void solarSystem::breakPlanet(planet p)

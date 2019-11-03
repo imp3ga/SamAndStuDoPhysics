@@ -20,10 +20,15 @@ class AstroObjectBase
         Eigen::Vector2d getVelocity(){return _velocity;};
         bool needsUpdate(){return _bNeedUpdate;};
         bool isFixed(){return _bFixed;};
+
+        void revertPosition();
         
 
     protected:
         double  _dMass, _dRestCoef = 1.0;
         bool _bNeedUpdate, _bFixed = false;
         Eigen::Vector2d _position, _velocity;
+        Eigen::Vector2d _positionPrev = Eigen::Vector2d(0., 0.);
+        Eigen::Vector2d _velocityPrev = Eigen::Vector2d(0., 0.);
+
 };
