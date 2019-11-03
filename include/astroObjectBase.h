@@ -21,7 +21,6 @@ class AstroObjectBase
         bool needsUpdate(){return _bNeedUpdate;};
         bool isFixed(){return _bFixed;};
         
-        std::pair<Eigen::Vector2d,Eigen::Vector2d> collisionResult(AstroObjectBase obj);
 
     protected:
         double  _dMass, _dRestCoef = 1.0;
