@@ -94,7 +94,7 @@ void runSolarSystem(int argc, char **argv){
 
 int main(int argc, char **argv){
 
-    std::cout << argv[1];
+    // std::cout << argv[1];
 
     if(argc > 1){
         
