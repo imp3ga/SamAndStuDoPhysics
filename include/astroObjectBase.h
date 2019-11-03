@@ -1,4 +1,6 @@
 #include <Eigen/Core>
+#include <vector>
+#define CONST_PI 3.14159265358979
 
 class AstroObjectBase 
 {
@@ -8,6 +10,9 @@ class AstroObjectBase
         void setVelocity(const Eigen::Vector2d v);
         void setFixed(bool bFixed);
         void setNeedsUpdate(bool bUpdate);
+        double dampingFactor(){return _dRestCoef;};
+
+        std::vector<int> _vecCurrentCollisions;
 
         double getMass(){return _dMass;};
         double getKE(){return 0.5 * _dMass * _velocity.squaredNorm();}
@@ -19,7 +24,7 @@ class AstroObjectBase
         std::pair<Eigen::Vector2d,Eigen::Vector2d> collisionResult(AstroObjectBase obj);
 
     protected:
-        double  _dMass;
+        double  _dMass, _dRestCoef = 1.0;
         bool _bNeedUpdate, _bFixed = false;
         Eigen::Vector2d _position, _velocity;
 };

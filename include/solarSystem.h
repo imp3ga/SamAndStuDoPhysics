@@ -14,10 +14,12 @@ class solarSystem
         void update(void);
         void getInfo(std::vector<Eigen::Vector2d> &allCentres,
                             std::vector<double> &allRadii);
-        double dampingFactor(){return _dampingFactor;};
+        void twoBodyCollision(planet p0, planet p1, Eigen::Vector2d &p0NewVel, Eigen::Vector2d &p1NewVel);
 
     private:
         int _nPlanets = 0;
-        double _dMassDensity, _initPlanetRad, _dampingFactor = 0.95;
+        double _dMassDensity, _initPlanetRad, _dampingFactor = 1.0;//0.95;
         std::vector<planet> _vecPlanets;
+        void updatePositionVelocity();
+        void checkCollisions();
 };

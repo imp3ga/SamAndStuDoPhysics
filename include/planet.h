@@ -9,6 +9,7 @@ class planet : public AstroObjectBase
         planet(const double r, const double rho, bool fixed);
         void setRadius(const double r);
         double getRadius(){return _dRadius;};
+        int nIdx;
 
     private:
         double _dRadius;
