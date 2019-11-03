@@ -13,7 +13,7 @@ void AstroObjectBase::setPosition(const Eigen::Vector2d s)
 
 void AstroObjectBase::setVelocity(const Eigen::Vector2d v)
 {
-    _velocity = v;
+    _velocity = v * _dRestCoef;
 }
 
 void AstroObjectBase::setFixed(bool bFixed)

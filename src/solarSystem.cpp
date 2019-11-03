@@ -9,13 +9,8 @@ solarSystem::solarSystem(double rho)
 void solarSystem::init(double initPlanetRad)
 {
     // Add the initial large planet
-    addPlanet(Eigen::Vector2d(0.,0.), Eigen::Vector2d(0.,0.), initPlanetRad);
+    addPlanet(Eigen::Vector2d(0.,0.), Eigen::Vector2d(0.,0.), 100.);
     // addCustomPlanet(Eigen::Vector2d(0.,0.), Eigen::Vector2d(0.,0.), initPlanetRad, 10000.0, false);
-    // planet initPlanet(initPlanetRad, _dMassDensity);
-    // initPlanet.setPosition(Eigen::Vector2d(0., 0.));
-    // initPlanet.setVelocity(Eigen::Vector2d(0.,0.));
-    // _vecPlanets.push_back(initPlanet);
-    // std::cout << "Initialized!\n";
     _initPlanetRad = initPlanetRad;
 }
 
@@ -56,6 +51,10 @@ void solarSystem::addPlanet(Eigen::Vector2d pos,
     newPlanet.setPosition(pos);
     newPlanet.setVelocity(vel);
 
+    static int idx = 0;
+    newPlanet.nIdx = idx;
+    ++idx;
+
     _vecPlanets.push_back(newPlanet);
     ++_nPlanets;
 }
@@ -72,11 +71,9 @@ void solarSystem::addCustomPlanet(Eigen::Vector2d pos,
     ++_nPlanets;
 }
 
-void solarSystem::update()
+void solarSystem::updatePositionVelocity()
 {
     Eigen::Vector2d aForces[_nPlanets - 1];
-    std::vector<planet> newPlanets;
-    Eigen::Vector2d totalMag(0.0, 0.0);
     for (int i = 0; i < _nPlanets; ++i)
     {
         planet &p0 = _vecPlanets[i];
@@ -86,12 +83,6 @@ void solarSystem::update()
         }
         Eigen::Vector2d p0Pos = p0.getPosition();
         double p0Mass = p0.getMass();
-        // if(p0Mass < 0)
-        // {
-        //     continue;
-        // }
-        totalMag += p0.getVelocity() * p0Mass;
-
         Eigen::Vector2d force(0., 0.);
         for (int j = 0; j < _nPlanets; ++j)
         {
@@ -106,93 +97,221 @@ void solarSystem::update()
             {
                 continue;
             }
-            // if(p1Mass < 0.)
-            // { 
-            //     continue;
-            // }
-            // Check for collisions
-            double dist = (p1Pos - p0Pos).norm();
-            if (dist < p0.getRadius() + p1.getRadius())
-            {
-                // Check for bounce or absorb
-                Eigen::Vector2d p0Vel = p0.getVelocity();
-                Eigen::Vector2d p1Vel = p1.getVelocity();
-                double dDot = p0Vel.normalized().dot(p1Vel.normalized());
-                // std::cout << dDot << "\n";
-
-                 
-
-                if(std::abs((p0.getVelocity() - p1.getVelocity()).norm()) > 5)
-                {
-                    // Bounce
-                    // std::cout << "bouncing...\n";
-                    Eigen::Vector2d p0p1Displacement = (p0Pos - p1Pos).normalized();
-                    Eigen::Vector2d p1p0Displacement = - p0p1Displacement;
-
-                    Eigen::Vector2d p0NewVel = p0Vel - (2.*p1Mass/(p0Mass+p1Mass)) *
-                    (p0Vel - p1Vel).dot(p0p1Displacement) * p0p1Displacement;
-                    Eigen::Vector2d p1NewVel = p1Vel - (2.*p0Mass/(p0Mass+p1Mass)) *
-                    (p1Vel - p0Vel).dot(p1p0Displacement) * p1p0Displacement;
-
-                    // double dKE_before = 0.5 * (p0Mass*p0Vel.squaredNorm() + p1Mass*p1Vel.squaredNorm());
-                    // double dKE_after = 0.5 * (p0Mass*p0NewVel.squaredNorm() + p1Mass*p1NewVel.squaredNorm());
-                    // std::cout << "KE before: " << dKE_before << ", KE after: " << dKE_after;
-
-                    _vecPlanets[i].setVelocity(p0NewVel * dampingFactor());
-                    _vecPlanets[j].setVelocity(p1NewVel * dampingFactor());
-
-                    _vecPlanets[i].setNeedsUpdate(true);
-                    _vecPlanets[j].setNeedsUpdate(true);
-                    continue;
-                }
-                else
-                {
-                    // Absorb
-                    double newMass = p0Mass + p1Mass;
-                    double newRadius = sqrt(newMass / _dMassDensity);       // Preferably remove this sqrt somehow
-                    planet pNew(newRadius, _dMassDensity, false);
-                    pNew.setPosition(p0Mass > p1Mass ? p0Pos : p1Pos);
-                    Eigen::Vector2d newVel = (p0Mass * p0Vel + p1Mass * p1Vel) / newMass;
-                    pNew.setVelocity(newVel);
-                    newPlanets.push_back(pNew);
-                    _vecPlanets[i].setMass(-1.0); _vecPlanets[j].setMass(-1.0);
-                    continue;
-                }
-            }
             double dForce = p0Mass * p1Mass / (p1Pos - p0Pos).squaredNorm();
             force += dForce * (p1Pos - p0Pos);
         }
         aForces[i] = force;
     }
-    // std::cout << "Total momentum of system: " << totalMag.transpose() << "\n";
-        // Remove negative mass planets (ie collided objects), add new ones
-        for (int i = 0; i < _nPlanets; ++i)
-        {
-            planet &planet = _vecPlanets[i];
-            double m = planet.getMass();
-            if(m < 0.0)
-            {
-                _vecPlanets.erase(_vecPlanets.begin() + i);
-                ++i;
-            }
-        }
-        _vecPlanets.insert(_vecPlanets.end(), newPlanets.begin(), newPlanets.end());
-        _nPlanets = _vecPlanets.size();
 
     for (int i = 0; i < _vecPlanets.size(); ++i)
+        {
+            planet &planet = _vecPlanets[i];
+            if(!planet.isFixed())
+            {   
+                // Update velocity
+                double mass = planet.getMass();
+                Eigen::Vector2d acc = aForces[i] / mass;
+                Eigen::Vector2d newVel = planet.getVelocity() + (0.001 * acc);      // Physics update is 1ms
+                planet.setVelocity(newVel);
+                // Update position
+                Eigen::Vector2d newPos = planet.getPosition() + (0.001 * newVel);   // Physics update is 1ms
+                _vecPlanets[i].setPosition(newPos);
+                _vecPlanets[i].setNeedsUpdate(false);
+            }
+        }
+}
+
+void solarSystem::checkCollisions()
+{
+    std::vector<planet> newPlanets;
+    for (int i = 0; i < _nPlanets; ++i)
     {
-        planet &planet = _vecPlanets[i];
-        if(!planet.isFixed())
-        {   
-            // Update velocity
-            double mass = planet.getMass();
-            Eigen::Vector2d acc = aForces[i] / mass;
-            Eigen::Vector2d newVel = planet.getVelocity() + (0.001 * acc);      // Physics update is 1ms
-            planet.setVelocity(newVel);
-            // Update position
-            Eigen::Vector2d newPos = planet.getPosition() + (0.001 * newVel);   // Physics update is 1ms
-            planet.setPosition(newPos);
-            planet.setNeedsUpdate(false);
+        planet &p0 = _vecPlanets[i];
+        Eigen::Vector2d p0Pos = p0.getPosition();
+        double p0Mass = p0.getMass();
+
+        Eigen::Vector2d force(0., 0.);
+        for (int j = 0; j < _nPlanets; ++j)
+        {
+            if(i == j)
+            {
+                continue;
+            }
+            planet &p1 = _vecPlanets[j];
+            bool bAlreadyDone = false;
+            for(int k = 0; k <p1._vecCurrentCollisions.size(); ++k)
+            {
+                if(p1._vecCurrentCollisions[k] == i)
+                {
+                    // std::cout << "Collision already done between i " << i << " and j " << j << "\n";
+                    bAlreadyDone = true;
+                }
+            }
+            if(bAlreadyDone)
+            {
+                continue;
+            }
+
+            Eigen::Vector2d p1Pos = p1.getPosition();
+            double p1Mass = p1.getMass();
+            // Check for collisions
+            double dist = (p1Pos - p0Pos).norm();
+            if (dist < p0.getRadius() + p1.getRadius())
+            {
+                p0._vecCurrentCollisions.push_back(j);
+                p1._vecCurrentCollisions.push_back(i);
+            }
         }
     }
+    // for (int i = 0; i < _nPlanets; ++i)
+    // {
+    //     planet &p0 = _vecPlanets[i];
+    //     std::vector<int> &vCollisions = p0._vecCurrentCollisions;
+    //     if(vCollisions.size() > 0)
+    //     {
+    //         std::cout << "Planet " << i << " collides with: ";
+    //         for(int j = 0; j < vCollisions.size(); ++j)
+    //         {
+    //             std::cout << vCollisions[j] << ", ";
+    //         }
+    //         std::cout << "\n";
+    //     }
+    // }
+
+    // Do collisions
+    for (int i = 0; i < _nPlanets; ++i)
+    {
+        planet &p0 = _vecPlanets[i];
+        std::vector<int> &vCollisions = p0._vecCurrentCollisions;
+        if(vCollisions.size() > 0)
+        {           
+            if(p0.needsUpdate() || _vecPlanets[vCollisions[0]].needsUpdate())
+            {
+                // std::cout << "Planet(s) have already been updated!\n";
+                continue;
+            }
+
+            // Two body collision
+            if(vCollisions.size() == 1)
+            {
+                // Check it's not actually a three body collision
+                bool bThree = false;
+                for(int j = 0; j < vCollisions.size(); ++j)
+                {
+                    if(_vecPlanets[vCollisions[j]]._vecCurrentCollisions.size() == 2)
+                    {
+                        bThree = true;
+                    }
+                }
+                if(!bThree)
+                {
+                    planet &p1 = _vecPlanets[vCollisions[0]];
+                    Eigen::Vector2d p0NewVel, p1NewVel;
+                    twoBodyCollision(p0, p1, p0NewVel, p1NewVel);
+
+                    _vecPlanets[i].setVelocity(p0NewVel);
+                    _vecPlanets[vCollisions[0]].setVelocity(p1NewVel);
+
+                    _vecPlanets[i].setNeedsUpdate(true);
+                    _vecPlanets[vCollisions[0]].setNeedsUpdate(true);
+                    // std::cout << "Planet velocities have been updated.\n";
+                    _vecPlanets[i]._vecCurrentCollisions.clear();
+                    _vecPlanets[vCollisions[0]]._vecCurrentCollisions.clear();
+                }
+            }
+
+            // Three body collision
+            if(vCollisions.size() == 2)
+            {
+                std::cout << "Three body collision!\n";
+                planet &p1 = _vecPlanets[vCollisions[0]];
+                planet &p2 = _vecPlanets[vCollisions[1]];
+
+                double dMass_p0 = p0.getMass();
+                double dMass_p1 = p1.getMass();
+                double dMass_p2 = p2.getMass();
+
+                Eigen::Vector2d p0NewVel, p1NewVel, p2NewVel, tmpVel;
+
+                // First do (0+2) to 1
+                // Find velocity of combined momentums of 0 and 2
+                double dMass_p0p2 = dMass_p0 + dMass_p2;
+                Eigen::Vector2d p0p2Vel = ((p0.getVelocity() * dMass_p0) + (p2.getVelocity() * dMass_p2)) / (dMass_p0p2);
+                // Create new object
+                planet tmp_p0p2(1.0, _dMassDensity, false);
+                tmp_p0p2.setPosition(p0.getPosition());
+                tmp_p0p2.setVelocity(p0p2Vel);
+                tmp_p0p2.setMass(dMass_p0p2);
+                // Perform collision
+                twoBodyCollision(tmp_p0p2, p1, tmpVel, p1NewVel);
+
+                // Second do (0+1) to 2
+                // Find velocity of combined momentums of 0 and 1
+                double dMass_p0p1 = dMass_p0 + dMass_p1;
+                Eigen::Vector2d p0p1Vel = ((p0.getVelocity() * dMass_p0) + (p1.getVelocity() * dMass_p1)) / (dMass_p0p1);
+                // Create new object
+                planet tmp_p0p1(1.0, _dMassDensity, false);
+                tmp_p0p1.setPosition(p0.getPosition());
+                tmp_p0p1.setVelocity(p0p1Vel);
+                tmp_p0p1.setMass(dMass_p0p1);
+                // Perform collision
+                twoBodyCollision(tmp_p0p1, p2, tmpVel, p2NewVel);
+
+                // Finally calculate impact on 0
+                Eigen::Vector2d p0NewVel_a, p0NewVel_b;
+                twoBodyCollision(p0, p1, p0NewVel_a, tmpVel);
+                twoBodyCollision(p0, p2, p0NewVel_b, tmpVel);
+    
+                _vecPlanets[i].setVelocity(p0NewVel_a + p0NewVel_b - p0.getVelocity());
+                _vecPlanets[vCollisions[0]].setVelocity(p1NewVel);
+                _vecPlanets[vCollisions[1]].setVelocity(p2NewVel);
+
+                _vecPlanets[i].setNeedsUpdate(true);
+                _vecPlanets[vCollisions[0]].setNeedsUpdate(true);
+                _vecPlanets[vCollisions[1]].setNeedsUpdate(true);
+
+                _vecPlanets[i]._vecCurrentCollisions.clear();
+                _vecPlanets[vCollisions[0]]._vecCurrentCollisions.clear();
+                _vecPlanets[vCollisions[1]]._vecCurrentCollisions.clear();
+            }
+
+            if(vCollisions.size() == 3)
+            {
+                std::cout << "Four body collision!\n";
+            }
+            if(vCollisions.size() == 4)
+            {
+                std::cout << "Five body collision!\n";
+            }
+
+            
+        }
+    }
+    // _vecPlanets.insert(_vecPlanets.end(), newPlanets.begin(), newPlanets.end());
+    // _nPlanets = _vecPlanets.size();
+}
+
+void solarSystem::twoBodyCollision(planet p0, planet p1, Eigen::Vector2d &p0NewVel, Eigen::Vector2d &p1NewVel)
+{
+    Eigen::Vector2d p0Pos = p0.getPosition();
+    Eigen::Vector2d p1Pos = p1.getPosition();
+    double p0Mass = p0.getMass();
+    double p1Mass = p1.getMass();
+    Eigen::Vector2d p0Vel = p0.getVelocity();
+    Eigen::Vector2d p1Vel = p1.getVelocity();
+
+    Eigen::Vector2d p0p1Displacement = (p0Pos - p1Pos).normalized();
+    Eigen::Vector2d p1p0Displacement = - p0p1Displacement;
+
+    p0NewVel = p0Vel - (2.*p1Mass/(p0Mass+p1Mass)) *
+    (p0Vel - p1Vel).dot(p0p1Displacement) * p0p1Displacement;
+    p1NewVel = p1Vel - (2.*p0Mass/(p0Mass+p1Mass)) *
+    (p1Vel - p0Vel).dot(p1p0Displacement) * p1p0Displacement;
+}
+
+void solarSystem::update()
+{
+    updatePositionVelocity();
+    checkCollisions();
+   
 }
