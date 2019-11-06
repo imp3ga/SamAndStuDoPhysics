@@ -196,7 +196,7 @@ void solarSystem::updatePositionVelocity()
             //     continue;
             // }
             
-            double dForce = 1E3 * p0Mass * p1Mass / pow((p1Pos - p0Pos).norm(), 2.0);
+            double dForce = 1E3 * p0Mass * p1Mass / (p1Pos - p0Pos).squaredNorm();
             std::cout << dForce << std::endl;
 
             // Eigen::Vector2d invRsqrd = (p1Pos - p0Pos).cwiseInverse();
@@ -495,12 +495,12 @@ void solarSystem::twoBodyCollision(planet &p0, planet &p1, bool bUpdate)
         if((p0Vel - p0NewVel).norm() > 9000.0)
         {
             std::cout << "Breaking planet " << id0 << std::endl;
-            // breakPlanet(p0);
+            breakPlanet(p0);
         }
         if((p1Vel - p1NewVel).norm() > 9000.0)
         {
             std::cout << "Breaking planet " << id1 << std::endl;
-            // breakPlanet(p1);
+            breakPlanet(p1);
         }
         
 
