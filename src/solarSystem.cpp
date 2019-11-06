@@ -198,7 +198,7 @@ void solarSystem::updatePositionVelocity()
             // }
             
             double dForce = 1E3 * p0Mass * p1Mass / (p1Pos - p0Pos).squaredNorm();
-            std::cout << dForce << std::endl;
+            // std::cout << p0.nIdx << " -> " << p1.nIdx << " = " <<  dForce << std::endl;
 
             // Eigen::Vector2d invRsqrd = (p1Pos - p0Pos).cwiseInverse();
             // force += p0Mass * p1Mass * invRsqrd;
@@ -210,6 +210,8 @@ void solarSystem::updatePositionVelocity()
         }
         // std::cout << "Total force on planet with id " << p0.nIdx << " is " << force.transpose() << std::endl; 
         vecForces.push_back(force);
+        if(p0.nIdx == 0)
+            std::cout <<  force[0] << std::endl;
     }
 
     for (int i = 0; i < _vecPlanets.size(); ++i)
@@ -281,7 +283,7 @@ bool solarSystem::checkCollisions()
             double dist = (p1Pos - p0Pos).norm();
             if (!bFragment && dist < p0.getRadius() + p1.getRadius())
             {
-                // std::cout << "Collision!\n";
+                std::cout << "Collision!\n";
                 bCollision = true;
                 p0._vecCurrentCollisions.push_back(j); 
                 p1._vecCurrentCollisions.push_back(i);
@@ -498,18 +500,16 @@ void solarSystem::twoBodyCollision(planet &p0, planet &p1, bool bUpdate)
         // std::cout << (p0Vel - p0NewVel).norm() << ", " << (p1Vel - p1NewVel).norm() << std::endl;
         std::cout << "Velocity change: \n p0: " << p0Vel.transpose() << "   =>   " << p0NewVel.transpose() << 
                         "\n p1: " << p1Vel.transpose() << "   =>   " << p1NewVel.transpose() << std::endl;
-        // if((p0Vel - p0NewVel).norm() > 9000.0)
-        // {
-        //     std::cout << "Breaking planet " << id0 << std::endl;
-        //     breakPlanet(p0);
-        // }
-        // if((p1Vel - p1NewVel).norm() > 9000.0)
-        // {
-        //     std::cout << "Breaking planet " << id1 << std::endl;
-        //     breakPlanet(p1);
-        // }
-        
-
+        if((p0Vel - p0NewVel).norm() > 9000.0)
+        {
+            std::cout << "Breaking planet " << id0 << std::endl;
+            breakPlanet(p0);
+        }
+        if((p1Vel - p1NewVel).norm() > 9000.0)
+        {
+            std::cout << "Breaking planet " << id1 << std::endl;
+            breakPlanet(p1);
+        }
     }
     else
     {
@@ -565,6 +565,7 @@ void solarSystem::breakPlanet(planet p)
 
     double newR = sqrt(pMass/(2.0*_dMassDensity));
     planet p0(newR, _dMassDensity, false), p1(newR, _dMassDensity, false);
+    // std::cout << "Old mass: " << pMass << ", new mass: " << p0.getMass() << std::endl;
     double pRadius = p.getRadius();
     // p0.setPosition(pPos + Eigen::Vector2d(pRadius + newR, newR) );
     // p1.setPosition(pPos + Eigen::Vector2d(pRadius + newR, - newR));
