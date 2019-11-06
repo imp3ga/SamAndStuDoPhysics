@@ -495,12 +495,12 @@ void solarSystem::twoBodyCollision(planet &p0, planet &p1, bool bUpdate)
         if((p0Vel - p0NewVel).norm() > 9000.0)
         {
             std::cout << "Breaking planet " << id0 << std::endl;
-            breakPlanet(p0);
+            // breakPlanet(p0);
         }
         if((p1Vel - p1NewVel).norm() > 9000.0)
         {
             std::cout << "Breaking planet " << id1 << std::endl;
-            breakPlanet(p1);
+            // breakPlanet(p1);
         }
         
 
