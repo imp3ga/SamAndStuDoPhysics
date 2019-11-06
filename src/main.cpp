@@ -1,5 +1,6 @@
 #include <GL/freeglut.h>
 #include <iostream>
+#include <iomanip>
 
 #include "include/main.h"
 // #include "include/solarSystem.h"
@@ -64,7 +65,6 @@ void keyHandler(unsigned char key, int x, int y)
     {   
         // centre
         _solarSystem.centre();
-        // std::cout << "(" << x << ", " << y << ")\n";
     }
     // else if(key == ' ')
     // {
@@ -94,6 +94,7 @@ void runSolarSystem(int argc, char **argv){
 
 int main(int argc, char **argv){
 
+    std::cout << std::setprecision(30) << "Begin!" << std::endl;
     // std::cout << argv[1];
 
     if(argc > 1){

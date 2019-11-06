@@ -35,4 +35,10 @@ void AstroObjectBase::revertPosition()
     _position = _positionPrev;
 }
 
+void AstroObjectBase::setPrevPositionVelocity(Eigen::Vector2d sPrev, Eigen::Vector2d vPrev)
+{
+    _positionPrev = sPrev;
+    _velocityPrev = vPrev;
+}
+
 

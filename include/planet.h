@@ -10,7 +10,11 @@ class planet : public AstroObjectBase
         void setRadius(const double r);
         double getRadius(){return _dRadius;};
         int nIdx;
+        void setToBeRemoved();
+        bool toBeRemoved(){return _bToBeRemoved;};
+        std::vector<int> _vecDontCollideWithIds;
 
     private:
         double _dRadius;
+        bool _bToBeRemoved = false;
 };

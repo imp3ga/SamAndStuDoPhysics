@@ -11,3 +11,9 @@ void planet::setRadius(const double r)
 {
     _dRadius = r;
 }
+
+void planet::setToBeRemoved()
+{
+    _bToBeRemoved = true;
+}
+

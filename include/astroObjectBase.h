@@ -21,6 +21,7 @@ class AstroObjectBase
         bool needsUpdate(){return _bNeedUpdate;};
         bool isFixed(){return _bFixed;};
 
+        void setPrevPositionVelocity(Eigen::Vector2d sPrev, Eigen::Vector2d vPrev);
         void revertPosition();
         
 
