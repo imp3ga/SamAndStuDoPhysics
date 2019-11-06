@@ -9,9 +9,9 @@ SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -o -std=gnu++11")
 # 	${CMAKE_SOURCE_DIR}/src/*.cpp)
 set(SRC_FILES
 	${CMAKE_SOURCE_DIR}/src/main.cpp
-	${CMAKE_SOURCE_DIR}/src/tests.cpp
+	# ${CMAKE_SOURCE_DIR}/src/tests.cpp
 	${CMAKE_SOURCE_DIR}/src/planet.cpp
-	${CMAKE_SOURCE_DIR}/src/solarSystem.cpp
+	# ${CMAKE_SOURCE_DIR}/src/solarSystem.cpp
 	${CMAKE_SOURCE_DIR}/src/astroObjectBase.cpp)
 	
 message(${SRC_FILES})
@@ -21,9 +21,9 @@ message(${SRC_FILES})
 # 	${CMAKE_SOURCE_DIR}/include/*.hpp)
 set(HEADER_FILES
 	${CMAKE_SOURCE_DIR}/include/main.h
-	${CMAKE_SOURCE_DIR}/include/tests.h
+	# ${CMAKE_SOURCE_DIR}/include/tests.h
 	${CMAKE_SOURCE_DIR}/include/planet.h
-	${CMAKE_SOURCE_DIR}/include/solarSystem.h
+	# ${CMAKE_SOURCE_DIR}/include/solarSystem.h
 	${CMAKE_SOURCE_DIR}/include/astroObjectBase.h)
 
 message(${HEADER_FILES})

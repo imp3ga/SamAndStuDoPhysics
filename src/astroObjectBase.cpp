@@ -1,44 +1,82 @@
+#include <iostream>
 #include "include/astroObjectBase.h"
 
-
-void AstroObjectBase::setMass(const double m)
+AstroObjectBase::AstroObjectBase(int nId, double dMass, Eigen::Vector2d position, Eigen::Vector2d velocity, 
+                                 double dRestCoef, double dMassDensity, std::vector<AstroObjectBase> &refVecObjects,
+                                 bool bInteracts)
 {
-    _dMass = m;
+    if(0 >= dMass)
+    {
+        std::cout << "ERROR: Cannot have 0 or negative mass!" << std::endl;
+        exit(1);
+    }
+    _nId = nId;
+    _dMass = dMass;
+    _position = position;
+    _velocity = velocity;
+    _dRestCoef = dRestCoef;
+    _dMassDensity = dMassDensity;
+    _pVecObjects = &refVecObjects;
+    _bInteracts = bInteracts;
+
+    _force = Eigen::Vector2d(0., 0.);
+    _momentum = Eigen::Vector2d(0., 0.);
+
+    std::cout << (_pVecObjects)->size() << " located at " << _pVecObjects <<  std::endl;
+
 }
 
-void AstroObjectBase::setPosition(const Eigen::Vector2d s)
+double AstroObjectBase::getMass()
 {
-    _positionPrev = _position;
-    _position = s;
+    return _dMass;
 }
 
-void AstroObjectBase::setVelocity(const Eigen::Vector2d v)
+double AstroObjectBase::getKE()
 {
-    _velocityPrev = _velocity;
-    _velocity = v * _dRestCoef;
+    return 0.5 * _dMass * _velocity.squaredNorm();
 }
 
-
-void AstroObjectBase::setFixed(bool bFixed)
+Eigen::Vector2d AstroObjectBase::getPosition()
 {
-    _bFixed = bFixed;
+    return _position;
 }
 
-void AstroObjectBase::setNeedsUpdate(bool bUpdate)
+Eigen::Vector2d AstroObjectBase::getVelocity()
 {
-    _bNeedUpdate = bUpdate;
+    return _velocity;
 }
 
-void AstroObjectBase::revertPosition()
+bool AstroObjectBase::addCollision(int nId)
 {
-    // _velocity = _velocityPrev;
-    _position = _positionPrev;
+    _vecCollisionIds.push_back(nId);
 }
 
-void AstroObjectBase::setPrevPositionVelocity(Eigen::Vector2d sPrev, Eigen::Vector2d vPrev)
+bool AstroObjectBase::update()
 {
-    _positionPrev = sPrev;
-    _velocityPrev = vPrev;
+    _force = Eigen::Vector2d(0., 0.);
+    if(!calculateForceGravity())
+    {
+        std::cout << "Error calculating gravity for planet ID " << _nId << std::endl;
+        exit(1);
+    }
+    if(!calculateForceCollisions())
+    {
+        std::cout << "Error calculating collisions for planet ID " << _nId << std::endl;
+        exit(1);
+    }
 }
 
+bool AstroObjectBase::calculateForceGravity()
+{
+    // int nSize = static_cast<int>(_pVecObjects->size());
+    // for (int i = 0; i < nSize; ++i)
+    // {
 
+    // }
+    return false;
+}
+
+bool AstroObjectBase::calculateForceCollisions()
+{
+    return false;
+}

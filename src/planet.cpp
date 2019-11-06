@@ -1,19 +1,14 @@
 #include "include/planet.h"
 
-planet::planet(const double r, const double rho, bool fixed)
+planet::planet(int nId, double dMass, Eigen::Vector2d position, Eigen::Vector2d velocity, 
+               double dRestCoef, double dMassDensity, std::vector<AstroObjectBase> &refVecObjects,
+               bool bInteracts)  : 
+        AstroObjectBase(nId, dMass, position, velocity, dRestCoef, dMassDensity, refVecObjects, bInteracts)
 {
-    setRadius(r);
-    setMass(r * r * rho);
-    setFixed(fixed);
+    _dRadius = sqrt(dMass / dMassDensity);
 }
 
-void planet::setRadius(const double r)
+double planet::getRadius()
 {
-    _dRadius = r;
+    return _dRadius;
 }
-
-void planet::setToBeRemoved()
-{
-    _bToBeRemoved = true;
-}
-

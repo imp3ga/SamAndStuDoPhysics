@@ -6,13 +6,11 @@
 class planet : public AstroObjectBase
 {
     public:
-        planet(const double r, const double rho, bool fixed);
-        void setRadius(const double r);
-        double getRadius(){return _dRadius;};
-        int nIdx;
-        void setToBeRemoved();
-        bool toBeRemoved(){return _bToBeRemoved;};
-        std::vector<int> _vecDontCollideWithIds;
+        planet(int nId, double dMass, Eigen::Vector2d position, Eigen::Vector2d velocity, 
+               double dRestCoef, double dMassDensity, std::vector<AstroObjectBase> &refVecObjects,
+               bool bInteracts);
+
+        double getRadius();
 
     private:
         double _dRadius;
