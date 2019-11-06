@@ -27,7 +27,7 @@ class AstroObjectBase
 
     protected:
         double  _dMass, _dRestCoef = 1.0;
-        bool _bNeedUpdate, _bFixed = false;
+        bool _bNeedUpdate = false, _bFixed = false;
         Eigen::Vector2d _position, _velocity;
         Eigen::Vector2d _positionPrev = Eigen::Vector2d(0., 0.);
         Eigen::Vector2d _velocityPrev = Eigen::Vector2d(0., 0.);

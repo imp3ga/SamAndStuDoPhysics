@@ -162,10 +162,11 @@ void solarSystem::updatePositionVelocity()
     for (int i = 0; i < _vecPlanets.size(); ++i)
     {
         planet &p0 = _vecPlanets[i];
-        // if (p0.needsUpdate())
-        // {
-        //     continue;
-        // }
+        if (p0.needsUpdate())      
+        {
+            // Need to update vel and pos
+            continue;
+        }
         Eigen::Vector2d p0Pos = p0.getPosition();
         double p0Mass = p0.getMass();
         Eigen::Vector2d force(0., 0.);
@@ -218,11 +219,14 @@ void solarSystem::updatePositionVelocity()
             {   
                 // Update velocity
                 double mass = planet.getMass();
-                Eigen::Vector2d acc = vecForces[i] / mass;
-                Eigen::Vector2d newVel = planet.getVelocity() + (0.001 * acc);      // Physics update is 1ms
-                planet.setVelocity(newVel);
+                if(!planet.needsUpdate())
+                {
+                    Eigen::Vector2d acc = vecForces[i] / mass;
+                    Eigen::Vector2d newVel = planet.getVelocity() + (0.001 * acc);      // Physics update is 1ms
+                    planet.setVelocity(newVel);
+                }
                 // Update position
-                Eigen::Vector2d newPos = planet.getPosition() + (0.001 * newVel);   // Physics update is 1ms
+                Eigen::Vector2d newPos = planet.getPosition() + (0.001 * planet.getVelocity());   // Physics update is 1ms
                 _vecPlanets[i].setPosition(newPos);
                 _vecPlanets[i].setNeedsUpdate(false);
             }
@@ -331,8 +335,8 @@ void solarSystem::resolveCollisions()
         {           
             // if(p0.needsUpdate() || _vecPlanets[vCollisions[0]].needsUpdate())
             // {
-                // std::cout << "Planet(s) have already been updated!\n";
-                // continue;
+            //     std::cout << "Planet(s) have already been updated!\n";
+            //     continue;
             // }
 
             // Two body collision
@@ -349,7 +353,7 @@ void solarSystem::resolveCollisions()
                 }
                 if(!bThree && !_vecPlanets[vCollisions[0]].toBeRemoved())
                 {
-                    // std::cout << "Two body collision!\n";
+                    std::cout << "Two body collision!\n";
                     planet &p1 = _vecPlanets[vCollisions[0]];
                     twoBodyCollision(p0, p1, true);
                     continue;
@@ -422,9 +426,9 @@ void solarSystem::resolveCollisions()
                 _vecPlanets[vCollisions[0]].setVelocity(p1.getVelocity());      ////!!!!!! just refering to itself
                 _vecPlanets[vCollisions[1]].setVelocity(p2.getVelocity());
 
-                _vecPlanets[i].setNeedsUpdate(true);
-                _vecPlanets[vCollisions[0]].setNeedsUpdate(true);
-                _vecPlanets[vCollisions[1]].setNeedsUpdate(true);
+                // _vecPlanets[i].setNeedsUpdate(true);
+                // _vecPlanets[vCollisions[0]].setNeedsUpdate(true);
+                // _vecPlanets[vCollisions[1]].setNeedsUpdate(true);
 
                 _vecPlanets[i]._vecCurrentCollisions.clear();
                 _vecPlanets[vCollisions[0]]._vecCurrentCollisions.clear();
@@ -492,16 +496,18 @@ void solarSystem::twoBodyCollision(planet &p0, planet &p1, bool bUpdate)
         _vecPlanets[id0]._vecCurrentCollisions.clear();
         _vecPlanets[id1]._vecCurrentCollisions.clear();
         // std::cout << (p0Vel - p0NewVel).norm() << ", " << (p1Vel - p1NewVel).norm() << std::endl;
-        if((p0Vel - p0NewVel).norm() > 9000.0)
-        {
-            std::cout << "Breaking planet " << id0 << std::endl;
-            // breakPlanet(p0);
-        }
-        if((p1Vel - p1NewVel).norm() > 9000.0)
-        {
-            std::cout << "Breaking planet " << id1 << std::endl;
-            // breakPlanet(p1);
-        }
+        std::cout << "Velocity change: \n p0: " << p0Vel.transpose() << "   =>   " << p0NewVel.transpose() << 
+                        "\n p1: " << p1Vel.transpose() << "   =>   " << p1NewVel.transpose() << std::endl;
+        // if((p0Vel - p0NewVel).norm() > 9000.0)
+        // {
+        //     std::cout << "Breaking planet " << id0 << std::endl;
+        //     breakPlanet(p0);
+        // }
+        // if((p1Vel - p1NewVel).norm() > 9000.0)
+        // {
+        //     std::cout << "Breaking planet " << id1 << std::endl;
+        //     breakPlanet(p1);
+        // }
         
 
     }
