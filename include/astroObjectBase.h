@@ -6,8 +6,7 @@ class AstroObjectBase
 {
     public:
         AstroObjectBase(int nId, double dMass, Eigen::Vector2d position, Eigen::Vector2d velocity, 
-                        double dRestCoef, double dMassDensity, std::vector<AstroObjectBase> &refVecObjects,
-                        bool bInteracts);
+                        double dRestCoef, double dMassDensity, std::vector<AstroObjectBase> &refVecObjects);
         double getMass();
         double getKE();
         Eigen::Vector2d getPosition();                          // Public so container can work out collisions
@@ -23,9 +22,8 @@ class AstroObjectBase
         bool calculateForceGravity();
         bool calculateForceCollisions();
         int _nId;
-        bool _bInteracts;
         double _dMass, _dMassDensity, _dRestCoef = 1.0;
         std::vector<AstroObjectBase> *_pVecObjects;
-        std::vector<int> _vecCollisionIds;
+        std::vector<int> _vecCollisionIds, _vecDontInteractIds;
         Eigen::Vector2d _position, _velocity, _force, _momentum;
 };

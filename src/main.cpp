@@ -97,11 +97,11 @@ int main(int argc, char **argv){
 
     std::vector<AstroObjectBase> testVec;
     std::cout << "v located at " << &testVec << std::endl;
-    planet testPlanet(0, 100., Eigen::Vector2d(0., 0.), Eigen::Vector2d(0., 0.), 1., 1000., testVec, true);
+    planet testPlanet(0, 100., Eigen::Vector2d(1000., 0.), Eigen::Vector2d(0., 0.), 1., 1000., testVec);
     testVec.push_back(testPlanet);
-    planet testPlanet2(0, 100., Eigen::Vector2d(0., 0.), Eigen::Vector2d(0., 0.), 1., 1000., testVec, true);
+    planet testPlanet2(0, 100., Eigen::Vector2d(0., 0.), Eigen::Vector2d(0., 0.), 1., 1000., testVec);
     testVec.push_back(testPlanet);
-    planet testPlanet3(0, 100., Eigen::Vector2d(0., 0.), Eigen::Vector2d(0., 0.), 1., 1000., testVec, true);
+    planet testPlanet3(0, 100., Eigen::Vector2d(0., 1000.), Eigen::Vector2d(0., 0.), 1., 1000., testVec);
 
 
 
