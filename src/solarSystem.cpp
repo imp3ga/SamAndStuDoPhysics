@@ -196,12 +196,16 @@ void solarSystem::updatePositionVelocity()
             //     continue;
             // }
             
-            Eigen::Vector2d invRsqrd = (p1Pos - p0Pos);
-            force += 1E-5 * p0Mass * p1Mass * invRsqrd;
+            double dForce = 1E3 * p0Mass * p1Mass / pow((p1Pos - p0Pos).norm(), 2.0);
+            std::cout << dForce << std::endl;
+
+            // Eigen::Vector2d invRsqrd = (p1Pos - p0Pos).cwiseInverse();
+            // force += p0Mass * p1Mass * invRsqrd;
 
             // double dForce = p0Mass * p1Mass / (p1Pos - p0Pos).squaredNorm();
-            // std::cout << "planet with idx " << p0.nIdx << " and mass " << p0Mass << " at position " << p0Pos.transpose() << " with planet with idx " << p1.nIdx << " and mass " << p1Mass << " at position " << p1Pos.transpose() << " creates a force of size " << dForce << std::endl;
-            // force += dForce * (p1Pos - p0Pos);
+            // std::cout << (p0Mass * p1Mass * invRsqrd).transpose() << std::endl;
+            // std::cout << "planet with idx " << p0.nIdx << " and mass " << p0Mass << " at position " << p0Pos.transpose() << " with planet with idx " << p1.nIdx << " and mass " << p1Mass << " at position " << p1Pos.transpose() << " creates a force of size " << (p0Mass * p1Mass * invRsqrd).transpose() << std::endl;
+            force += dForce * (p1Pos - p0Pos).normalized();
         }
         // std::cout << "Total force on planet with id " << p0.nIdx << " is " << force.transpose() << std::endl; 
         vecForces.push_back(force);
@@ -491,12 +495,12 @@ void solarSystem::twoBodyCollision(planet &p0, planet &p1, bool bUpdate)
         if((p0Vel - p0NewVel).norm() > 9000.0)
         {
             std::cout << "Breaking planet " << id0 << std::endl;
-            breakPlanet(p0);
+            // breakPlanet(p0);
         }
         if((p1Vel - p1NewVel).norm() > 9000.0)
         {
             std::cout << "Breaking planet " << id1 << std::endl;
-            breakPlanet(p1);
+            // breakPlanet(p1);
         }
         
 
