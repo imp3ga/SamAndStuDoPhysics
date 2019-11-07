@@ -51,7 +51,7 @@ void mouseHandler(int button, int state, int x, int y)
             Eigen::Vector2d pos(x, y);
             Eigen::Vector2d mouseDisp = pos - _initXY;
             double t = std::chrono::duration_cast<std::chrono::nanoseconds>(Clock::now() - _initTime).count()  / 1E9;
-            Eigen::Vector2d v = 2.0 * mouseDisp / t;
+            Eigen::Vector2d v = _dMouseMoveSensitivity * mouseDisp / t;
             double r = 100.0 * t * t;
             _system.addObject(_dMouseDownSensitivity * t * t, pos,  v, _dInitMassDensity);
         }

@@ -17,16 +17,21 @@ class AstroObjectBase
         Eigen::Vector2d getVelocity();                          // Could be private?
         std::vector<AstroObjectBase*> _vecCurrentCollisions;     // Container will tell add collisions
         bool addCollision(AstroObjectBase *pObj1);
+        bool removeCollision(AstroObjectBase *pObj1);
         bool updateForces();
         bool updateMotion();
+        bool addForce(Eigen::Vector2d force);
         int getId();
         double getDistanceBetween(AstroObjectBase *pObj1);
 
         bool setPosition(Eigen::Vector2d position);         // Dont really want to do this but need it for centering
         bool collidesWith(AstroObjectBase *pObj1);
+        bool doesNotInteractWith(int nId);
 
     protected:
         bool _bNeedUpdate = false, _bFixed = false;
+        std::vector<AstroObjectBase*> _vecCollisions;
+        Eigen::Vector2d _position, _velocity, _force, _momentum;
     
     private:
         virtual bool calculateForceCollisions() = 0;
@@ -35,10 +40,9 @@ class AstroObjectBase
         bool calculateForceGravity();
 
         int _nId;
-        double _dMass, _dMassDensity, _dRestCoef = 1.0, _G = 1E5;
-        std::vector<AstroObjectBase*> *_pVecObjects, _vecCollisions;
+        double _dMass, _dMassDensity, _dRestCoef = 1.0, _G = 1.0;//1E5;
+        std::vector<AstroObjectBase*> *_pVecObjects;
         std::vector<int> _vecDontInteractIds;
-        Eigen::Vector2d _position, _velocity, _force, _momentum;
 };
 
 #endif

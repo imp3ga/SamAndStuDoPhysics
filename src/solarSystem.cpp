@@ -9,9 +9,10 @@ bool solarSystem::init(double dInitPlanetMass, double dInitMassDensity)
     _dInitPlanetMass = dInitPlanetMass;
     _dInitMassDensity = dInitMassDensity;
     addObject(dInitPlanetMass, Eigen::Vector2d(0., 0.),  Eigen::Vector2d(0., 0.), dInitMassDensity);
+    addObject(100., Eigen::Vector2d(200., 200.),  Eigen::Vector2d(-600., -600.), dInitMassDensity);
 
-    addObject(100., Eigen::Vector2d(-100., 0.),  Eigen::Vector2d(0., 1000.), dInitMassDensity);
-    addObject(100., Eigen::Vector2d(100., 0.),  Eigen::Vector2d(0., -1000.), dInitMassDensity);
+    // addObject(100., Eigen::Vector2d(-100., 0.),  Eigen::Vector2d(0., 1000.), dInitMassDensity);
+    // addObject(100., Eigen::Vector2d(100., 0.),  Eigen::Vector2d(0., -1000.), dInitMassDensity);
 }
 
 bool solarSystem::addObject(double dMass, Eigen::Vector2d position, Eigen::Vector2d velocity, double dMassDensity)
@@ -117,8 +118,8 @@ bool solarSystem::checkCollisions()
                 continue;
             }
             double dDistance = pPlanet0->getDistanceBetween(pPlanet1);
-            double dRadDiff = pPlanet1->getRadius() - pPlanet0->getRadius();
-            if (dDistance <= dRadDiff)
+            double dRadSum = pPlanet1->getRadius() + pPlanet0->getRadius();
+            if (dDistance <= dRadSum)
             {
                 pPlanet0->addCollision(pPlanet1);
                 pPlanet1->addCollision(pPlanet0);
