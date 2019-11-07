@@ -15,6 +15,6 @@ double planet::getRadius()
 
 bool planet::calculateForceCollisions()
 {
-    std::cout << "Calculating PLANET collisions" << std::endl;
+    // std::cout << "Calculating PLANET collisions" << std::endl;
     return false;
 }

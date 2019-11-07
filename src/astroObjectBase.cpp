@@ -64,35 +64,39 @@ bool AstroObjectBase::addCollision(AstroObjectBase *pObj1)
     _vecCollisions.push_back(pObj1);
 }
 
-bool AstroObjectBase::update()
+bool AstroObjectBase::updateMotion()
+{
+    // std::cout << "Updating pos and vel" << std::endl;
+    if (!updatePositionVelocity())
+    {
+        // std::cout << "Planet ID " << _nId << " updated." << std::endl;
+        return true;
+    }
+    else
+    {
+        // std::cout << "Planet ID " << _nId << " NOT updated." << std::endl;
+        return true;
+    }
+    
+}
+
+bool AstroObjectBase::updateForces()
 {
     _force = Eigen::Vector2d(0., 0.);
-
     // std::cout << "Calculating gravity" << std::endl;
     if (!calculateForceGravity())
     {
-        std::cout << "Error calculating gravity for planet ID " << _nId << std::endl;
+        // std::cout << "Error calculating gravity for planet ID " << _nId << std::endl;
         // return false;
     }
     // std::cout << "Calculating collisions" << std::endl;
     if (!calculateForceCollisions())
     {
-        std::cout << "Error calculating collisions for planet ID " << _nId << std::endl;
+        // std::cout << "Error calculating collisions for planet ID " << _nId << std::endl;
         // return false;
     }
-    // std::cout << "Updating pos and vel" << std::endl;
-    if (!updatePositionVelocity())
-    {
-        std::cout << "Planet ID " << _nId << " updated." << std::endl;
-        return true;
-    }
-    else
-    {
-        std::cout << "Planet ID " << _nId << " NOT updated." << std::endl;
-        return true;
-    }
-    
 }
+
 
 int AstroObjectBase::getId()
 {
@@ -108,16 +112,16 @@ double AstroObjectBase::getDistanceBetween(AstroObjectBase *pObj1)
 
 bool AstroObjectBase::updatePositionVelocity()
 {
-    if(!_bFixed && !_bNeedUpdate) // Not sure if _bNeedUpdate is needed anymore?
-    {
+    // if(!_bFixed && _bNeedUpdate) // Not sure if _bNeedUpdate is needed anymore?
+    // {
         _velocity += 0.001 * (_force / _dMass);           // Physics update is 1ms
         _position += 0.001 * _velocity;                   // Physics update is 1ms
         return true;
-    }
-    else
-    {
-        return false;
-    }
+    // }
+    // else
+    // {
+        // return false;
+    // }
 }
 
 bool AstroObjectBase::calculateForceGravity()
@@ -132,7 +136,6 @@ bool AstroObjectBase::calculateForceGravity()
     {
         // Object to compare against
         AstroObjectBase *pObj = (*_pVecObjects)[i];            // This could be better
-        
         if (_nId == pObj->_nId)
         {
             // Don't interact with self
@@ -149,11 +152,20 @@ bool AstroObjectBase::calculateForceGravity()
         }
 
         double obj1Mass = pObj->getMass();
-        Eigen::Vector2d obj1Pos = pObj->getPosition();    
+        Eigen::Vector2d obj1Pos = pObj->getPosition(); 
+        Eigen::Vector2d displacement = obj1Pos - getPosition();
+        if (0 >= displacement.norm() - 1E-1)
+        {
+            std::cout << "Distance between " << _nId << " and " << pObj->getId() << 
+            " too small, ignoring gravity force. " << std::endl;
+            return false; 
+        }
 
         // Add gravitational force (G is arbitrary)
-        double dForce = 1E3 * getMass() * obj1Mass / (obj1Pos - getPosition()).squaredNorm();
+        double dForce = _G * getMass() * obj1Mass / displacement.squaredNorm();
         _force += dForce * (obj1Pos - getPosition()).normalized();
     }
+    // std::cout << "total force on id " << _nId << " is " << _force.transpose() << std::endl;
+    _bNeedUpdate = true;
     return true;
 }

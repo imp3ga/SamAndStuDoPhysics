@@ -12,7 +12,7 @@ class solarSystem
     public:
         // solarSystem();
         bool init(double dInitPlanetMass, double dMassDensity);
-        bool addObject(int nId, double dMass, Eigen::Vector2d position, Eigen::Vector2d velocity, double dMassDensity);
+        bool addObject(double dMass, Eigen::Vector2d position, Eigen::Vector2d velocity, double dMassDensity);
         bool reset();
         bool centre();
         bool removeObject(const int nId);

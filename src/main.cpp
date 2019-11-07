@@ -31,8 +31,35 @@ void physicsLoop(int val){
     glutTimerFunc(1, physicsLoop, 0);                                       // 1ms
 }
 
+void mouseHandler(int button, int state, int x, int y) 
+{
+    x -= _dHalfWindowWidth;
+    y = - (y - _dHalfWindowHeight);
+
+    if (state == GLUT_DOWN)
+    {
+        if (button == GLUT_LEFT_BUTTON)
+        {
+            _initXY = Eigen::Vector2d(x, y);
+            _initTime = Clock::now();
+        }
+    }
+    if (state == GLUT_UP)
+    {
+        if (button == GLUT_LEFT_BUTTON)
+        {
+            Eigen::Vector2d pos(x, y);
+            Eigen::Vector2d mouseDisp = pos - _initXY;
+            double t = std::chrono::duration_cast<std::chrono::nanoseconds>(Clock::now() - _initTime).count()  / 1E9;
+            Eigen::Vector2d v = 2.0 * mouseDisp / t;
+            double r = 100.0 * t * t;
+            _system.addObject(_dMouseDownSensitivity * t * t, pos,  v, _dInitMassDensity);
+        }
+  }
+}
+
 void runSolarSystem(int argc, char **argv){
-    _system.init(100., 10.);
+    _system.init(1000., _dInitMassDensity);
 
     // openGL initialization
     glutInit(&argc, argv);
@@ -43,7 +70,7 @@ void runSolarSystem(int argc, char **argv){
     glutCreateWindow("Planets");
     glOrtho(-_dHalfWindowWidth, _dHalfWindowWidth, -_dHalfWindowHeight, _dHalfWindowHeight, 0, 1);
     glutDisplayFunc(display);
-    // glutMouseFunc(mouseHandler);
+    glutMouseFunc(mouseHandler);
     // glutKeyboardFunc(keyHandler);
     physicsLoop(0);
 

@@ -17,7 +17,8 @@ class AstroObjectBase
         Eigen::Vector2d getVelocity();                          // Could be private?
         std::vector<AstroObjectBase*> _vecCurrentCollisions;     // Container will tell add collisions
         bool addCollision(AstroObjectBase *pObj1);
-        bool update();
+        bool updateForces();
+        bool updateMotion();
         int getId();
         double getDistanceBetween(AstroObjectBase *pObj1);
 
@@ -34,7 +35,7 @@ class AstroObjectBase
         bool calculateForceGravity();
 
         int _nId;
-        double _dMass, _dMassDensity, _dRestCoef = 1.0;
+        double _dMass, _dMassDensity, _dRestCoef = 1.0, _G = 1E5;
         std::vector<AstroObjectBase*> *_pVecObjects, _vecCollisions;
         std::vector<int> _vecDontInteractIds;
         Eigen::Vector2d _position, _velocity, _force, _momentum;
