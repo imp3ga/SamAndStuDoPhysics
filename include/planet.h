@@ -10,9 +10,9 @@ class planet : public AstroObjectBase
 {
     public:
         planet(int nId, double dMass, Eigen::Vector2d position, Eigen::Vector2d velocity, 
-               double dRestCoef, double dMassDensity, std::vector<AstroObjectBase*> &refVecObjects);
-        bool calculateForceCollisions();
+               double dRestCoef, double dMassDensity);
         double getRadius();
+        bool calculateForceCollisions(std::vector<AstroObjectBase> &refVecObjects);
 
     private:
         double _dRadius;

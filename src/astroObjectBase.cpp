@@ -2,7 +2,7 @@
 #include "include/astroObjectBase.h"
 
 AstroObjectBase::AstroObjectBase(int nId, double dMass, Eigen::Vector2d position, Eigen::Vector2d velocity, 
-                                 double dRestCoef, double dMassDensity, std::vector<AstroObjectBase*> &refVecObjects)
+                                 double dRestCoef, double dMassDensity)
 {
     if(0 >= dMass)
     {
@@ -15,7 +15,6 @@ AstroObjectBase::AstroObjectBase(int nId, double dMass, Eigen::Vector2d position
     _velocity = velocity;
     _dRestCoef = dRestCoef;
     _dMassDensity = dMassDensity;
-    _pVecObjects = &refVecObjects;
 
     _force = Eigen::Vector2d(0., 0.);
     _momentum = Eigen::Vector2d(0., 0.);
@@ -64,18 +63,18 @@ bool AstroObjectBase::addCollision(AstroObjectBase *pObj1)
     _vecCollisions.push_back(pObj1);
 }
 
-bool AstroObjectBase::update()
+bool AstroObjectBase::update(std::vector<AstroObjectBase*> *refVecObjects)
 {
     _force = Eigen::Vector2d(0., 0.);
 
     // std::cout << "Calculating gravity" << std::endl;
-    if (!calculateForceGravity())
+    if (!calculateForceGravity(refVecObjects))
     {
         std::cout << "Error calculating gravity for planet ID " << _nId << std::endl;
         // return false;
     }
     // std::cout << "Calculating collisions" << std::endl;
-    if (!calculateForceCollisions())
+    if (!calculateForceCollisions(refVecObjects))
     {
         std::cout << "Error calculating collisions for planet ID " << _nId << std::endl;
         // return false;
@@ -92,6 +91,26 @@ bool AstroObjectBase::update()
         return true;
     }
     
+}
+
+bool AstroObjectBase::hasAlreadyInteracted(std::vector<int> _otherDontInteractIds){
+
+    int nSize = static_cast<int>(_otherDontInteractIds.size());
+
+    for(int i = 0 ; i< nSize; i++){
+
+        if(find(_otherDontInteractIds.begin(), _otherDontInteractIds.end(), _nId) != _otherDontInteractIds.end())
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+std::vector<int> AstroObjectBase::getDontInteractIDs()
+{
+    return _vecDontInteractIds;
 }
 
 int AstroObjectBase::getId()
@@ -120,7 +139,11 @@ bool AstroObjectBase::updatePositionVelocity()
     }
 }
 
-bool AstroObjectBase::calculateForceGravity()
+void AstroObjectBase::setAlreadyInteracted(bool value){
+    _alreadyInteracted = value;
+}
+
+bool AstroObjectBase::calculateForceGravity(std::vector<AstroObjectBase*> *_pVecObjects)
 {
     if (nullptr == _pVecObjects)
     {

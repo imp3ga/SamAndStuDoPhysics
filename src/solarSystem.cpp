@@ -16,7 +16,7 @@ bool solarSystem::init(double dInitPlanetMass, double dInitMassDensity)
 
 bool solarSystem::addObject(int nId, double dMass, Eigen::Vector2d position, Eigen::Vector2d velocity, double dMassDensity)
 {
-    planet *p = new planet(nId, dMass, position, velocity, _dRestCoef, dMassDensity, _vecObjects);
+    planet *p = new planet(nId, dMass, position, velocity, _dRestCoef, dMassDensity);
     _vecObjects.emplace_back(p);
 }
 
@@ -70,10 +70,10 @@ bool solarSystem::removeObjects()
     }
 }
 
-bool solarSystem::update()
+void solarSystem::resetInteracted()
 {
     int nObjects = _vecObjects.size();
-    std::cout << "Updating solar system." << std::endl;
+    std::cout << "Resetting interact status of all objects" << std::endl;
     for (int i = 0; i < nObjects; ++i)
     {      
         planet *pPlanet = static_cast<planet*>(_vecObjects[i]);
@@ -82,7 +82,26 @@ bool solarSystem::update()
             std::cout << "pPlanet null, exit" << std::endl;
             exit(1);
         }
-        _vecObjects[i]->update();
+        _vecObjects[i]->setAlreadyInteracted(false);
+    }
+}
+
+bool solarSystem::update()
+{
+    int nObjects = _vecObjects.size();
+    std::cout << "Updating solar system." << std::endl;
+    
+    resetInteracted();
+    
+    for (int i = 0; i < nObjects; ++i)
+    {      
+        planet *pPlanet = static_cast<planet*>(_vecObjects[i]);
+        if(!pPlanet)
+        {
+            std::cout << "pPlanet null, exit" << std::endl;
+            exit(1);
+        }
+        _vecObjects[i]->update(&_vecObjects);
     }
 
     checkCollisions();

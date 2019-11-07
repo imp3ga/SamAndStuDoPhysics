@@ -18,7 +18,8 @@ class solarSystem
         bool removeObject(const int nId);
         bool update();
         bool getGlVertices(std::vector<std::vector<Eigen::Vector2d>> &vecVertices);
-
+        std::vector<AstroObjectBase*> getVecObjects(){return _vecObjects;};
+        void resetInteracted();
 
     private:
         bool checkCollisions();
