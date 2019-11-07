@@ -4,7 +4,14 @@
 
 #include "include/main.h"
 #include "include/planet.h"
-// #include "include/solarSystem.h"
+#include "include/solarSystem.h"
+
+int main()
+{
+    solarSystem system;
+    system.init(100., 10.);
+    return 0;
+}
 
 // void display(){
 //     glClear(GL_COLOR_BUFFER_BIT);
@@ -93,17 +100,19 @@
 //     glutMainLoop();
 // }
 
-int main(int argc, char **argv){
+// int main(int argc, char **argv){
 
-    std::vector<AstroObjectBase> testVec;
-    std::cout << "v located at " << &testVec << std::endl;
-    planet testPlanet(0, 100., Eigen::Vector2d(1000., 0.), Eigen::Vector2d(0., 0.), 1., 1000., testVec);
-    testVec.push_back(testPlanet);
-    planet testPlanet2(0, 100., Eigen::Vector2d(0., 0.), Eigen::Vector2d(0., 0.), 1., 1000., testVec);
-    testVec.push_back(testPlanet);
-    planet testPlanet3(0, 100., Eigen::Vector2d(0., 1000.), Eigen::Vector2d(0., 0.), 1., 1000., testVec);
+    // std::vector<AstroObjectBase*> testVec;
+    // std::cout << "v located at " << &testVec << std::endl;
+    // planet *pPlanet, *pPlanet2;
+    // planet testPlanet(0, 100., Eigen::Vector2d(0., 0.), Eigen::Vector2d(0., 0.), 1., 1000., testVec);
+    // pPlanet = &testPlanet;
+    // testVec.push_back(pPlanet);
+    // planet testPlanet2(1, 100., Eigen::Vector2d(0., 0.), Eigen::Vector2d(0., 0.), 1., 1000., testVec);
+    // pPlanet2 = &testPlanet2;
+    // testVec.push_back(pPlanet2);
 
-
+    // pPlanet->update();
 
     // std::cout << std::setprecision(30) << "Begin!" << std::endl;
     // // std::cout << argv[1];
@@ -121,7 +130,7 @@ int main(int argc, char **argv){
     //     runSolarSystem(argc, argv);
     // }
 
-    return 0;
-}
+//     return 0;
+// }
 
 

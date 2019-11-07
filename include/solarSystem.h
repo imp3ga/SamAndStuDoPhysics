@@ -1,32 +1,26 @@
-#include "include/planet.h"
-// #include "include/solarSystem.h"
+#include "include/astroObjectBase.h"
 #include <Eigen/Core>
+// #include <Eigen/Dense>
 #include <vector>
 class solarSystem
 {
     public:
-        solarSystem(double rho) ;
-        void init(double initPlanetRad);
-        void reset();
-        void centre();
-        void addPlanet(Eigen::Vector2d pos, Eigen::Vector2d vel, double r);
-        void addPlanet(planet p0);
-        void removePlanet(planet p0);
-        void removePlanets();
-        void addCustomPlanet(Eigen::Vector2d pos, Eigen::Vector2d vel, double r, double rho, bool fixed);
-        void update(void);
-        void getInfo(std::vector<Eigen::Vector2d> &allCentres,
-                            std::vector<double> &allRadii);
-        void twoBodyCollision(planet &p0, planet &p1, bool bUpdate);
-        void breakPlanet(planet p0);
-        int findByIdx(int idx);
+        // solarSystem();
+        bool init(double dInitPlanetMass, double dMassDensity);
+        bool addObject(int nId, double dMass, Eigen::Vector2d position, Eigen::Vector2d velocity, double dMassDensity);
+        bool reset();
+        bool centre();
+        bool removeObject(const int nId);
+        bool update();
+
+
     private:
-        double _dMassDensity, _initPlanetRad, _dampingFactor = 1.0;//0.95;
-        std::vector<planet> _vecPlanets, _vecRemovePlanets;
-        void updatePositionVelocity();
         bool checkCollisions();
-        void resolveCollisions();
-        void resolveRisidualCollisions();
+        bool removeObjects();
 
         int _nPlanetIdx = 0;
+        double _dRestCoef = 1.0, _dInitPlanetMass, _dInitMassDensity;
+        Eigen::MatrixXd objectDistances; 
+        std::vector<AstroObjectBase*> _vecObjects;
+        std::vector<std::vector<AstroObjectBase*>::iterator> _vecToBeRemoved;
 };

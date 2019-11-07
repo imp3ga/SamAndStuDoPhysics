@@ -11,7 +11,7 @@ set(SRC_FILES
 	${CMAKE_SOURCE_DIR}/src/main.cpp
 	# ${CMAKE_SOURCE_DIR}/src/tests.cpp
 	${CMAKE_SOURCE_DIR}/src/planet.cpp
-	# ${CMAKE_SOURCE_DIR}/src/solarSystem.cpp
+	${CMAKE_SOURCE_DIR}/src/solarSystem.cpp
 	${CMAKE_SOURCE_DIR}/src/astroObjectBase.cpp)
 	
 message(${SRC_FILES})
@@ -23,7 +23,7 @@ set(HEADER_FILES
 	${CMAKE_SOURCE_DIR}/include/main.h
 	# ${CMAKE_SOURCE_DIR}/include/tests.h
 	${CMAKE_SOURCE_DIR}/include/planet.h
-	# ${CMAKE_SOURCE_DIR}/include/solarSystem.h
+	${CMAKE_SOURCE_DIR}/include/solarSystem.h
 	${CMAKE_SOURCE_DIR}/include/astroObjectBase.h)
 
 message(${HEADER_FILES})

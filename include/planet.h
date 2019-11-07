@@ -1,3 +1,6 @@
+#ifndef PLANET_H_
+#define PLANET_H_
+
 #include <Eigen/Core>
 #include "include/astroObjectBase.h"
 
@@ -7,11 +10,13 @@ class planet : public AstroObjectBase
 {
     public:
         planet(int nId, double dMass, Eigen::Vector2d position, Eigen::Vector2d velocity, 
-               double dRestCoef, double dMassDensity, std::vector<AstroObjectBase> &refVecObjects);
-
+               double dRestCoef, double dMassDensity, std::vector<AstroObjectBase*> &refVecObjects);
+        bool calculateForceCollisions();
         double getRadius();
 
     private:
         double _dRadius;
         bool _bToBeRemoved = false;
 };
+
+#endif
