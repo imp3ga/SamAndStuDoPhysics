@@ -90,11 +90,7 @@ bool solarSystem::update()
 
 bool solarSystem::checkCollisions()
 {
-    // Update distances matrix
-    int nObjects = _vecObjects.size();
-    Eigen::MatrixXd objectDistances, radiiDifference;
-    objectDistances.resize(nObjects, nObjects);
-    radiiDifference.resize(nObjects, nObjects);
+    const int nObjects = _vecObjects.size();
     for (int i = 0; i < nObjects; ++i)
     {   
         planet *pPlanet0 = dynamic_cast<planet*>(_vecObjects[i]);
@@ -105,14 +101,20 @@ bool solarSystem::checkCollisions()
                 continue;
             }
             planet *pPlanet1 = dynamic_cast<planet*>(_vecObjects[j]);
+            if (pPlanet1->collidesWith(pPlanet0))
+            {
+                // Already done
+                continue;
+            }
             double dDistance = pPlanet0->getDistanceBetween(pPlanet1);
             double dRadDiff = pPlanet1->getRadius() - pPlanet0->getRadius();
-            objectDistances(i, j) = dDistance;
-            radiiDifference(i, j) = dRadDiff;
+            if (dDistance <= dRadDiff)
+            {
+                pPlanet0->addCollision(pPlanet1);
+                pPlanet1->addCollision(pPlanet0);
+            }
         }
     }
-    std::cout << objectDistances << std::endl;
-    std::cout << radiiDifference << std::endl;
     // 
     // for (int i = 0; i < _vecObjects.size(); ++i)
     // {

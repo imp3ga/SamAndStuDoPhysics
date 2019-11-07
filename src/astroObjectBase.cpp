@@ -42,14 +42,26 @@ bool AstroObjectBase::setPosition(Eigen::Vector2d position)
     _position = position;
 }
 
+bool AstroObjectBase::collidesWith(AstroObjectBase *pObj1)
+{
+    int nId = pObj1->getId();
+    auto it = std::find_if(_vecCollisions.begin(),
+                           _vecCollisions.end(),
+                            [nId] (AstroObjectBase* pObj) 
+                            {
+                                return nId == pObj->getId();
+                            });
+    return !(it == _vecCollisions.end());
+}
+
 Eigen::Vector2d AstroObjectBase::getVelocity()
 {
     return _velocity;
 }
 
-bool AstroObjectBase::addCollision(int nId)
+bool AstroObjectBase::addCollision(AstroObjectBase *pObj1)
 {
-    _vecCollisionIds.push_back(nId);
+    _vecCollisions.push_back(pObj1);
 }
 
 bool AstroObjectBase::update()
