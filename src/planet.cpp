@@ -38,7 +38,7 @@ bool planet::calculateForceCollisions()
          "\nmomentum: " << momentumP1.transpose() << std::endl;
         Eigen::Vector2d impulse = momentumP1.normalized().dot(displacementUnitVec) * momentumP1.norm() * displacementUnitVec / 0.001;
         addForce(impulse);  // 1ms
-        pPlanet1->addForce(impulse);
+        pPlanet1->addForce(-impulse);
         std::cout << "force after: " << _force.transpose() << std::endl;
         // Remove collisions
         removeCollision(pPlanet1);
