@@ -10,6 +10,7 @@ int main()
 {
     solarSystem system;
     system.init(100., 10.);
+    system.update();
     return 0;
 }
 

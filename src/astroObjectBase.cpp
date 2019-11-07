@@ -19,9 +19,6 @@ AstroObjectBase::AstroObjectBase(int nId, double dMass, Eigen::Vector2d position
 
     _force = Eigen::Vector2d(0., 0.);
     _momentum = Eigen::Vector2d(0., 0.);
-
-    std::cout << (_pVecObjects)->size() << " located at " << _pVecObjects <<  std::endl;
-
 }
 
 double AstroObjectBase::getMass()
@@ -55,23 +52,23 @@ bool AstroObjectBase::addCollision(int nId)
     _vecCollisionIds.push_back(nId);
 }
 
-bool AstroObjectBase::update(Eigen::VectorXd &objectDistances)
+bool AstroObjectBase::update()
 {
-    _pObjectDistances = &objectDistances;
     _force = Eigen::Vector2d(0., 0.);
 
+    // std::cout << "Calculating gravity" << std::endl;
     if (!calculateForceGravity())
     {
         std::cout << "Error calculating gravity for planet ID " << _nId << std::endl;
         return false;
     }
-
+    // std::cout << "Calculating collisions" << std::endl;
     if (!calculateForceCollisions())
     {
         std::cout << "Error calculating collisions for planet ID " << _nId << std::endl;
         return false;
     }
-
+    // std::cout << "Updating pos and vel" << std::endl;
     if (!updatePositionVelocity())
     {
         std::cout << "Planet ID " << _nId << " updated." << std::endl;
@@ -79,7 +76,7 @@ bool AstroObjectBase::update(Eigen::VectorXd &objectDistances)
     }
     else
     {
-        std::cout << "Planet ID " << _nId << "NOT updated." << std::endl;
+        std::cout << "Planet ID " << _nId << " NOT updated." << std::endl;
         return true;
     }
     
@@ -89,6 +86,13 @@ int AstroObjectBase::getId()
 {
     return _nId;
 }
+
+double AstroObjectBase::getDistanceBetween(AstroObjectBase *pObj1)
+{
+    Eigen::Vector2d displacement = pObj1->getPosition() - _position;
+    return displacement.norm();
+}
+
 
 bool AstroObjectBase::updatePositionVelocity()
 {
@@ -110,17 +114,12 @@ bool AstroObjectBase::calculateForceGravity()
     {
         std::cout << "ERROR! _pVecObjects is nullptr!" << std::endl;
     }
-    if (nullptr == _pObjectDistances)
-    {
-        std::cout << "ERROR! _pObjectDistances is nullptr!" << std::endl;
-    }
     
     int nSize = static_cast<int>(_pVecObjects->size());
     for (int i = 0; i < nSize; ++i)
     {
         // Object to compare against
         AstroObjectBase *pObj = (*_pVecObjects)[i];            // This could be better
-        std::cout << "object with id " << pObj->_nId << " has mass " << pObj->getMass() << std::endl;
         
         if (_nId == pObj->_nId)
         {

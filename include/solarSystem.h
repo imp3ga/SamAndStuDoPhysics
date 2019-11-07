@@ -20,7 +20,6 @@ class solarSystem
 
         int _nPlanetIdx = 0;
         double _dRestCoef = 1.0, _dInitPlanetMass, _dInitMassDensity;
-        Eigen::MatrixXd objectDistances; 
         std::vector<AstroObjectBase*> _vecObjects;
         std::vector<std::vector<AstroObjectBase*>::iterator> _vecToBeRemoved;
 };

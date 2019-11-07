@@ -9,14 +9,15 @@ bool solarSystem::init(double dInitPlanetMass, double dInitMassDensity)
     _dInitPlanetMass = dInitPlanetMass;
     _dInitMassDensity = dInitMassDensity;
     addObject(_nPlanetIdx++, dInitPlanetMass, Eigen::Vector2d(0., 0.),  Eigen::Vector2d(0., 0.), dInitMassDensity);
+
+    addObject(_nPlanetIdx++, 30., Eigen::Vector2d(-1000., 0.),  Eigen::Vector2d(0., 0.), dInitMassDensity);
+    addObject(_nPlanetIdx++, 50., Eigen::Vector2d(1000., 0.),  Eigen::Vector2d(0., 0.), dInitMassDensity);
 }
 
 bool solarSystem::addObject(int nId, double dMass, Eigen::Vector2d position, Eigen::Vector2d velocity, double dMassDensity)
 {
-    AstroObjectBase *pObj0;
-    planet planet0(nId, dMass, position, velocity, _dRestCoef, dMassDensity, _vecObjects);
-    pObj0 = &planet0;
-    _vecObjects.push_back(pObj0);
+    planet *p = new planet(nId, dMass, position, velocity, _dRestCoef, dMassDensity, _vecObjects);
+    _vecObjects.emplace_back(p);
 }
 
 bool solarSystem::reset()
@@ -72,31 +73,46 @@ bool solarSystem::removeObjects()
 bool solarSystem::update()
 {
     int nObjects = _vecObjects.size();
+    std::cout << "Updating solar system." << std::endl;
     for (int i = 0; i < nObjects; ++i)
-    {
-        Eigen::VectorXd distanceVec = objectDistances.block(1, 1, i, nObjects);
-        _vecObjects[i]->update(distanceVec);
+    {      
+        planet *pPlanet = static_cast<planet*>(_vecObjects[i]);
+        if(!pPlanet)
+        {
+            std::cout << "pPlanet null, exit" << std::endl;
+            exit(1);
+        }
+        _vecObjects[i]->update();
     }
 
-    // Update distances matrix
-    objectDistances.resize(nObjects, nObjects);
-    for (int i = 0; i < nObjects; ++i)
-    {
+    checkCollisions();
+}
 
+bool solarSystem::checkCollisions()
+{
+    // Update distances matrix
+    int nObjects = _vecObjects.size();
+    Eigen::MatrixXd objectDistances, radiiDifference;
+    objectDistances.resize(nObjects, nObjects);
+    radiiDifference.resize(nObjects, nObjects);
+    for (int i = 0; i < nObjects; ++i)
+    {   
+        planet *pPlanet0 = dynamic_cast<planet*>(_vecObjects[i]);
         for (int j = 0; j < nObjects; ++j)
         {
             if (i == j)
             {
                 continue;
             }
+            planet *pPlanet1 = dynamic_cast<planet*>(_vecObjects[j]);
+            double dDistance = pPlanet0->getDistanceBetween(pPlanet1);
+            double dRadDiff = pPlanet1->getRadius() - pPlanet0->getRadius();
+            objectDistances(i, j) = dDistance;
+            radiiDifference(i, j) = dRadDiff;
         }
     }
-    // checkCollisions();
-}
-
-bool solarSystem::checkCollisions()
-{
-
+    std::cout << objectDistances << std::endl;
+    std::cout << radiiDifference << std::endl;
     // 
     // for (int i = 0; i < _vecObjects.size(); ++i)
     // {
@@ -567,8 +583,8 @@ bool solarSystem::checkCollisions()
 //         }
 //     }
 //     resolveCollisions();
-// }
 
+// }
 // void solarSystem::twoBodyCollision(planet &p0, planet &p1, bool bUpdate)
 // {
 //     Eigen::Vector2d p0Pos = p0.getPosition();
