@@ -1,6 +1,11 @@
+#ifndef SOLARSYSTEM_H_
+#define SOLARSYSTEM_H_
+
 #include "include/astroObjectBase.h"
 #include <Eigen/Core>
 // #include <Eigen/Dense>
+#include <GL/freeglut.h>
+
 #include <vector>
 class solarSystem
 {
@@ -12,6 +17,7 @@ class solarSystem
         bool centre();
         bool removeObject(const int nId);
         bool update();
+        bool getGlVertices(std::vector<std::vector<Eigen::Vector2d>> &vecVertices);
 
 
     private:
@@ -23,3 +29,5 @@ class solarSystem
         std::vector<AstroObjectBase*> _vecObjects;
         std::vector<std::vector<AstroObjectBase*>::iterator> _vecToBeRemoved;
 };
+
+#endif

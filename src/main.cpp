@@ -6,38 +6,56 @@
 #include "include/planet.h"
 #include "include/solarSystem.h"
 
-int main()
-{
-    solarSystem system;
-    system.init(100., 10.);
-    system.update();
-    return 0;
+void display(){
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    std::vector<std::vector<Eigen::Vector2d>> vecVertices;
+    _system.getGlVertices(vecVertices);
+
+    for (int i = 0; i < vecVertices.size(); ++i)
+    {
+        glBegin(GL_POLYGON);
+        for (int j = 0; j < vecVertices[i].size(); ++j)
+        {
+            glVertex2f(vecVertices[i][j][0],  vecVertices[i][j][1]);
+        }
+        glEnd();
+    }
+    glFlush();
+    glutSwapBuffers();
 }
 
-// void display(){
-//     glClear(GL_COLOR_BUFFER_BIT);
+void physicsLoop(int val){
+    display();
+    _system.update();
+    glutTimerFunc(1, physicsLoop, 0);                                       // 1ms
+}
 
-//     std::vector<Eigen::Vector2d> allCentres;
-//     std::vector<double> allRadii;
-//     _solarSystem.getInfo(allCentres, allRadii);
+void runSolarSystem(int argc, char **argv){
+    _system.init(100., 10.);
 
-//     for(int i = 0; i < allCentres.size(); ++i)
-//     {
-//         glBegin(GL_POLYGON);
-//         for(float arc = 0; arc < 2 * CONST_PI; arc += 0.5){
-//             glVertex2f(allRadii[i]*(cos(arc)) + allCentres[i][0], allRadii[i]*(sin(arc)) + allCentres[i][1]);
-//         }
-//         glEnd();
-//     }
-//     glFlush();
-//     glutSwapBuffers();
-// }
+    // openGL initialization
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_DOUBLE);
+    glutInitWindowSize(_dHalfWindowWidth * 2.0, _dHalfWindowHeight * 2.0);
+    glutInitWindowPosition((glutGet(GLUT_SCREEN_WIDTH)- _dHalfWindowWidth * 2.0)/2,
+                        (glutGet(GLUT_SCREEN_HEIGHT)- _dHalfWindowHeight * 2.0)/2);
+    glutCreateWindow("Planets");
+    glOrtho(-_dHalfWindowWidth, _dHalfWindowWidth, -_dHalfWindowHeight, _dHalfWindowHeight, 0, 1);
+    glutDisplayFunc(display);
+    // glutMouseFunc(mouseHandler);
+    // glutKeyboardFunc(keyHandler);
+    physicsLoop(0);
 
-// void physicsLoop(int val){
-//     display();
-//     _solarSystem.update();
-//     glutTimerFunc(1, physicsLoop, 0);                                       // 1ms
-// }
+    glutMainLoop();
+}
+
+
+int main(int argc, char **argv)
+{
+    runSolarSystem(argc, argv);
+    return 0;
+}
 
 // void mouseHandler(int button, int state, int x, int y) 
 // {

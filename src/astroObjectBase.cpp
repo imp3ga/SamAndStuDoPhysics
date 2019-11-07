@@ -72,13 +72,13 @@ bool AstroObjectBase::update()
     if (!calculateForceGravity())
     {
         std::cout << "Error calculating gravity for planet ID " << _nId << std::endl;
-        return false;
+        // return false;
     }
     // std::cout << "Calculating collisions" << std::endl;
     if (!calculateForceCollisions())
     {
         std::cout << "Error calculating collisions for planet ID " << _nId << std::endl;
-        return false;
+        // return false;
     }
     // std::cout << "Updating pos and vel" << std::endl;
     if (!updatePositionVelocity())

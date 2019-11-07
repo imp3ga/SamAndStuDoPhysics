@@ -115,11 +115,29 @@ bool solarSystem::checkCollisions()
             }
         }
     }
-    // 
-    // for (int i = 0; i < _vecObjects.size(); ++i)
-    // {
-    //     _vecObjects[i]->update();
-    // }
+}
+
+bool solarSystem::getGlVertices(std::vector<std::vector<Eigen::Vector2d>> &vecVertices)
+{
+    for (int i = 0; i < _vecObjects.size(); ++i)
+    {
+        std::vector<Eigen::Vector2d> colVertices;
+        planet *pPlanet = dynamic_cast<planet*>(_vecObjects[i]);
+        if (nullptr != pPlanet)      // Not entirely sure this is going to work for differentiating types
+        {
+            // Planet
+            double dRadius = pPlanet->getRadius();
+            Eigen::Vector2d pos = pPlanet->getPosition();
+            for(float arc = 0; arc < 2 * CONST_PI; arc += 0.5)
+            {
+                Eigen::Vector2d coord;
+                coord(0) = dRadius*(cos(arc)) + pos[0];
+                coord(1) = dRadius*(sin(arc)) + pos[1];
+                colVertices.push_back(coord);
+            }
+        }
+        vecVertices.push_back(colVertices);        
+    }
 }
 
 // solarSystem::solarSystem(double rho)
