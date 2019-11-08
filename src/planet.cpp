@@ -29,17 +29,20 @@ bool planet::calculateForceCollisions()
             std::cout << "planet id " << getId() << " and " << pPlanet1->getId() << " do not interact." << std::endl;
         }
 
-        std::cout << getId() << " <= " << pPlanet1->getId() << std::endl;
-        std::cout << "force before: " << _force.transpose() << std::endl;
+        // std::cout << getId() << " <= " << pPlanet1->getId() << std::endl;
+        // std::cout << "force before: " << _force.transpose() << std::endl;
+
+        std::cout << "id " << getId() << " at " << this << " collides with id " << pPlanet1->getId() << " at " << pPlanet1 << std::endl;
         
-        Eigen::Vector2d displacementUnitVec = -(pPlanet1->getPosition() - getPosition()).normalized();
+        Eigen::Vector2d displacementUnitVec = (pPlanet1->getPosition() - getPosition()).normalized();
         Eigen::Vector2d momentumP1 = pPlanet1->getMass() * pPlanet1->getVelocity();
-        std::cout << "p1: \n velocity: " << pPlanet1->getVelocity().transpose() << "\n mass: " << pPlanet1->getMass() << 
-         "\nmomentum: " << momentumP1.transpose() << std::endl;
+        // std::cout << "p1: \n velocity: " << pPlanet1->getVelocity().transpose() << "\n mass: " << pPlanet1->getMass() << 
+        //  "\nmomentum: " << momentumP1.transpose() << std::endl;
         Eigen::Vector2d impulse = momentumP1.normalized().dot(displacementUnitVec) * momentumP1.norm() * displacementUnitVec / 0.001;
         addForce(impulse);  // 1ms
-        pPlanet1->addForce(-impulse);
-        std::cout << "force after: " << _force.transpose() << std::endl;
+        pPlanet1->addForce(- impulse);
+        // std::cout << "force after: " << _force.transpose() << std::endl;
+        // std::cout << "id " << getId() << " and " << pPlanet1->getId() << " are located at " << this << " and " << pPlanet1 << std::endl;
         // Remove collisions
         removeCollision(pPlanet1);
         // pPlanet1->removeCollision(this);

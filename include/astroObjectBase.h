@@ -15,7 +15,7 @@ class AstroObjectBase
         double getKE();
         Eigen::Vector2d getPosition();                          // Public so container can work out collisions
         Eigen::Vector2d getVelocity();                          // Could be private?
-        std::vector<AstroObjectBase*> _vecCurrentCollisions;     // Container will tell add collisions
+        // std::vector<AstroObjectBase*> _vecCurrentCollisions;     // Container will tell add collisions
         bool addCollision(AstroObjectBase *pObj1);
         bool removeCollision(AstroObjectBase *pObj1);
         bool updateForces();

@@ -19,6 +19,7 @@ bool solarSystem::addObject(double dMass, Eigen::Vector2d position, Eigen::Vecto
 {
     planet *p = new planet(_nPlanetIdx++, dMass, position, velocity, _dRestCoef, dMassDensity, _vecObjects);
     _vecObjects.emplace_back(p);
+    std::cout << "Added planet with ID " << p->getId() << " at " << p << std::endl;
 }
 
 bool solarSystem::reset()

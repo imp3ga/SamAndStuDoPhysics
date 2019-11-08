@@ -69,7 +69,9 @@ Eigen::Vector2d AstroObjectBase::getVelocity()
 
 bool AstroObjectBase::addCollision(AstroObjectBase *pObj1)
 {
-    _vecCollisions.push_back(pObj1);
+    AstroObjectBase *pNew = pObj1;
+    pNew = pObj1;
+    _vecCollisions.push_back(pNew);
 }
 
 bool AstroObjectBase::removeCollision(AstroObjectBase *pObj1)
@@ -110,8 +112,8 @@ bool AstroObjectBase::updateMotion()
 
 bool AstroObjectBase::addForce(Eigen::Vector2d force)
 {
-    std::cout << _nId << " gets force change of " << force.transpose() << std::endl;
     _force += force;
+    std::cout << _nId << " gets force change of " << force.transpose() << ", total force now is " << _force.transpose() << std::endl;
 }
 
 bool AstroObjectBase::updateForces()
@@ -148,10 +150,10 @@ bool AstroObjectBase::updatePositionVelocity()
 {
     // if(!_bFixed && _bNeedUpdate) // Not sure if _bNeedUpdate is needed anymore?
     // {
-        std::cout << " Updating pos and vel for id " << _nId << ", force is " << _force.transpose() << std::endl;
+        // std::cout << " Updating pos and vel for id " << _nId << ", force is " << _force.transpose() << std::endl;
         _velocity += 0.001 * (_force / _dMass);           // Physics update is 1ms
         _position += 0.001 * _velocity;                   // Physics update is 1ms
-        std::cout << " vel is " << _velocity.transpose() << std::endl;
+        // std::cout << " vel is " << _velocity.transpose() << ", force is " << _velocity.transpose() << std::endl;
 
         return true;
     // }
