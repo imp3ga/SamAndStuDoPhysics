@@ -5,6 +5,8 @@
 #include "include/main.h"
 // #include "include/solarSystem.h"
 
+
+
 void display(){
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -25,8 +27,23 @@ void display(){
 }
 
 void physicsLoop(int val){
-    display();
-    _solarSystem.update();
+
+    if(mode == planetsMode){
+        display();
+        _solarSystem.update();
+    }
+    else if(mode == flowMode){
+        
+        
+
+        _initTime = Clock::now();
+        _flowContainer.display();
+        _flowContainer.update(t);
+        t = std::chrono::duration_cast<std::chrono::nanoseconds>(Clock::now() - _initTime).count()  / 1E9;
+        
+        
+    }
+    
     glutTimerFunc(1, physicsLoop, 0);                                       // 1ms
 }
 
@@ -46,7 +63,7 @@ void mouseHandler(int button, int state, int x, int y)
     if (button == GLUT_LEFT_BUTTON) {
         Eigen::Vector2d pos(x, y);
         Eigen::Vector2d mouseDisp = pos - _initXY;
-        double t = std::chrono::duration_cast<std::chrono::nanoseconds>(Clock::now() - _initTime).count()  / 1E9;
+        t = std::chrono::duration_cast<std::chrono::nanoseconds>(Clock::now() - _initTime).count()  / 1E9;
         Eigen::Vector2d v = 2.0 * mouseDisp / t;
         double r = 100.0 * t * t;
         _solarSystem.addPlanet(pos, v, r);
@@ -56,6 +73,12 @@ void mouseHandler(int button, int state, int x, int y)
 
 void keyHandler(unsigned char key, int x, int y)
 {
+    if(key == 'm'){
+        cycleMode();
+    }
+    if(mode == flowMode){
+        _flowContainer.handleKeyPress(key);
+    }
     if(key == 'r')
     {
         // reset
@@ -66,12 +89,24 @@ void keyHandler(unsigned char key, int x, int y)
         // centre
         _solarSystem.centre();
     }
+    
     // else if(key == ' ')
     // {
     //     std::cout << "(" << x << ", " << y << ")\n";
     // }
 }
 
+void cycleMode(){
+    switch(mode){
+        case planetsMode:
+            _flowContainer.printHelp();
+            mode = flowMode;
+            break;
+        case flowMode:
+            mode = planetsMode;
+        break;
+    };
+}
 
 void runSolarSystem(int argc, char **argv){
     _solarSystem.init(50.0);
@@ -86,6 +121,7 @@ void runSolarSystem(int argc, char **argv){
     glOrtho(-_dHalfWindowWidth, _dHalfWindowWidth, -_dHalfWindowHeight, _dHalfWindowHeight, 0, 1);
     glutDisplayFunc(display);
     glutMouseFunc(mouseHandler);
+    glutSetKeyRepeat(GLUT_KEY_REPEAT_OFF);
     glutKeyboardFunc(keyHandler);
     physicsLoop(0);
 
@@ -95,7 +131,6 @@ void runSolarSystem(int argc, char **argv){
 int main(int argc, char **argv){
 
     std::cout << std::setprecision(30) << "Begin!" << std::endl;
-    // std::cout << argv[1];
 
     if(argc > 1){
         

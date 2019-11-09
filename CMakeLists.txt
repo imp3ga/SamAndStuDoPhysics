@@ -12,7 +12,12 @@ set(SRC_FILES
 	${CMAKE_SOURCE_DIR}/src/tests.cpp
 	${CMAKE_SOURCE_DIR}/src/planet.cpp
 	${CMAKE_SOURCE_DIR}/src/solarSystem.cpp
-	${CMAKE_SOURCE_DIR}/src/astroObjectBase.cpp)
+	${CMAKE_SOURCE_DIR}/src/astroObjectBase.cpp
+	${CMAKE_SOURCE_DIR}/src/basicParticle.cpp
+	${CMAKE_SOURCE_DIR}/src/fluidParticle.cpp
+	${CMAKE_SOURCE_DIR}/src/flowContainer.cpp
+	${CMAKE_SOURCE_DIR}/src/velocityField.cpp
+	)
 	
 message(${SRC_FILES})
 
@@ -24,7 +29,12 @@ set(HEADER_FILES
 	${CMAKE_SOURCE_DIR}/include/tests.h
 	${CMAKE_SOURCE_DIR}/include/planet.h
 	${CMAKE_SOURCE_DIR}/include/solarSystem.h
-	${CMAKE_SOURCE_DIR}/include/astroObjectBase.h)
+	${CMAKE_SOURCE_DIR}/include/astroObjectBase.h
+	${CMAKE_SOURCE_DIR}/include/basicParticle.h
+	${CMAKE_SOURCE_DIR}/include/fluidParticle.h
+	${CMAKE_SOURCE_DIR}/include/flowContainer.h
+	${CMAKE_SOURCE_DIR}/include/velocityField.h
+)
 
 message(${HEADER_FILES})
 # link_directories(${CMAKE_SOURCE_DIR}/lib)
