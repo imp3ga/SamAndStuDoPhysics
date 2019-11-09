@@ -28,7 +28,7 @@ void display(){
 void physicsLoop(int val){
     display();
     _system.update();
-    glutTimerFunc(1, physicsLoop, 0);                                       // 1ms
+    glutTimerFunc(0.1, physicsLoop, 0);                                       // 1ms
 }
 
 void mouseHandler(int button, int state, int x, int y) 
@@ -59,7 +59,7 @@ void mouseHandler(int button, int state, int x, int y)
 }
 
 void runSolarSystem(int argc, char **argv){
-    _system.init(1000., _dInitMassDensity);
+    _system.init(3000., _dInitMassDensity);
 
     // openGL initialization
     glutInit(&argc, argv);

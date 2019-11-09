@@ -9,7 +9,10 @@ bool solarSystem::init(double dInitPlanetMass, double dInitMassDensity)
     _dInitPlanetMass = dInitPlanetMass;
     _dInitMassDensity = dInitMassDensity;
     addObject(dInitPlanetMass, Eigen::Vector2d(0., 0.),  Eigen::Vector2d(0., 0.), dInitMassDensity);
-    addObject(100., Eigen::Vector2d(200., 200.),  Eigen::Vector2d(-600., -600.), dInitMassDensity);
+    
+    
+    addObject(dInitPlanetMass, Eigen::Vector2d(300., 300.),  Eigen::Vector2d(0.,0.), dInitMassDensity);
+    // addObject(100., Eigen::Vector2d(-100., -100.),  Eigen::Vector2d(600., 600.), dInitMassDensity);
 
     // addObject(100., Eigen::Vector2d(-100., 0.),  Eigen::Vector2d(0., 1000.), dInitMassDensity);
     // addObject(100., Eigen::Vector2d(100., 0.),  Eigen::Vector2d(0., -1000.), dInitMassDensity);
@@ -19,7 +22,7 @@ bool solarSystem::addObject(double dMass, Eigen::Vector2d position, Eigen::Vecto
 {
     planet *p = new planet(_nPlanetIdx++, dMass, position, velocity, _dRestCoef, dMassDensity, _vecObjects);
     _vecObjects.emplace_back(p);
-    std::cout << "Added planet with ID " << p->getId() << " at " << p << std::endl;
+    std::cout << "Added planet with ID " << p->getId() << " at " << p << " radius " << p->getRadius() << std::endl;
 }
 
 bool solarSystem::reset()
@@ -75,18 +78,13 @@ bool solarSystem::removeObjects()
 bool solarSystem::update()
 {
     int nObjects = _vecObjects.size();
-    // std::cout << "Updating solar system." << std::endl;
-    for (int i = 0; i < nObjects; ++i)
-    {      
-        planet *pPlanet = static_cast<planet*>(_vecObjects[i]);
-        if(!pPlanet)
-        {
-            std::cout << "pPlanet null, exit" << std::endl;
-            exit(1);
-        }
-        _vecObjects[i]->updateForces();
-    }
+    bool bRv;
+    // bRv = applyGravity();
+    // bRv = updateMotion();
+    // bRv = checkCollisions();
+    // bRv = resolveCollisions();
 
+    bRv = checkCollisions();
     for (int i = 0; i < nObjects; ++i)
     {      
         planet *pPlanet = static_cast<planet*>(_vecObjects[i]);
@@ -95,13 +93,55 @@ bool solarSystem::update()
             std::cout << "pPlanet null, exit" << std::endl;
             exit(1);
         }
-        _vecObjects[i]->updateMotion();
+        _vecObjects[i]->calculateForceGravity();
+        _vecObjects[i]->calculateForceCollisions();
+
     }
-    checkCollisions();
+     for (int i = 0; i < nObjects; ++i)
+    {      
+        planet *pPlanet = static_cast<planet*>(_vecObjects[i]);
+        if(!pPlanet)
+        {
+            std::cout << "pPlanet null, exit" << std::endl;
+            exit(1);
+        }
+        _vecObjects[i]->updatePositionVelocity();
+    }
+    for (int i = 0; i < nObjects; ++i)
+    {      
+        planet *pPlanet = static_cast<planet*>(_vecObjects[i]);
+        if(!pPlanet)
+        {
+            std::cout << "pPlanet null, exit" << std::endl;
+            exit(1);
+        }
+        // _vecObjects[i]->calculateForceCollisions();
+    }
+    // for (int i = 0; i < nObjects; ++i)
+    // {      
+    //     planet *pPlanet = static_cast<planet*>(_vecObjects[i]);
+    //     if(!pPlanet)
+    //     {
+    //         std::cout << "pPlanet null, exit" << std::endl;
+    //         exit(1);
+    //     }
+    //     _vecObjects[i]->updatePositionVelocity();
+    // }
+
+
+
+    // bRv = checkCollisions();
+    // bRv = resolveCollisions();
+
+
+    // std::cout << "Updating solar system." << std::endl;
+
+
 }
 
 bool solarSystem::checkCollisions()
 {
+    bool bCollision = false;
     const int nObjects = _vecObjects.size();
     for (int i = 0; i < nObjects; ++i)
     {   
@@ -122,10 +162,148 @@ bool solarSystem::checkCollisions()
             double dRadSum = pPlanet1->getRadius() + pPlanet0->getRadius();
             if (dDistance <= dRadSum)
             {
+                bCollision = true;
                 pPlanet0->addCollision(pPlanet1);
                 pPlanet1->addCollision(pPlanet0);
             }
         }
+    }
+    return bCollision;
+}
+
+bool solarSystem::resolveCollisions()
+{
+    int nObjects = _vecObjects.size();
+    for (int m = 0;m < nObjects; ++m)
+    {   
+        planet *pPlanet0 = dynamic_cast<planet*>(_vecObjects[m]);
+        // Check if reached non-collision state
+        for (int i = 0; i < pPlanet0->_vecDontCollideIds.size(); ++i)
+        {
+            int nId = pPlanet0->_vecDontCollideIds[i];
+            planet *pPlanet1 = static_cast<planet*>(pPlanet0->findById(nId));
+            if (nullptr == pPlanet1)
+            {
+                std::cout << "ERROR! Could not find by id!" << std::endl;
+            }
+            double dDistance = pPlanet0->getDistanceBetween(pPlanet1) ;
+            if (dDistance > pPlanet0->getRadius() + pPlanet1->getRadius())
+            {
+                pPlanet0->removeDoesNotCollideWith(pPlanet1->getId());
+            }
+        }
+
+        int nCollisions = pPlanet0->_vecCollisions.size();
+        for (int i = 0; i < nCollisions; ++i)
+        {
+            std::cout << pPlanet0->getId() << " Collision! Velocity before is " << pPlanet0->_velocity.transpose() << " position is " << pPlanet0->_position.transpose()  << std::endl;
+            // pPlanet0->_velocity += 0.001 *_force / getMass();
+            // std::cout << "         new velocity calc: " << pPlanet0->_velocity.transpose() << std::endl;
+            planet *pPlanet1 = static_cast<planet*>(pPlanet0->_vecCollisions[i]);
+            // if (pPlanet0->_bNeedUpdate || pPlanet1->_bNeedUpdate)
+            // {
+            //     continue;
+            // }
+            if (nullptr == pPlanet1)
+            {
+                std::cout << "ERROR! pPlanet1 is nullptr!" << std::endl;
+            }
+            if (pPlanet0->doesNotCollideWith(pPlanet1->getId()))
+            {
+                std::cout << "planet id " << pPlanet0->getId() << " and " << pPlanet1->getId() << " do not collide." << std::endl;
+                pPlanet0->removeCollision(pPlanet1);
+                continue;
+            }
+
+            Eigen::Vector2d p0Pos = pPlanet0->getPosition();
+            Eigen::Vector2d p1Pos = pPlanet1->getPosition();
+            Eigen::Vector2d p0p1Displacement = (p0Pos - p1Pos).normalized();
+            Eigen::Vector2d p1p0Displacement = - p0p1Displacement;
+
+            Eigen::Vector2d p0NewVel, p1NewVel;
+            p0NewVel = pPlanet0->getVelocity() - (2.*pPlanet1->getMass()/(pPlanet0->getMass()+pPlanet1->getMass())) *
+            (pPlanet0->getVelocity() - pPlanet1->getVelocity()).dot(p0p1Displacement) * p0p1Displacement;
+            p1NewVel = pPlanet1->getVelocity() - (2.*pPlanet0->getMass()/(pPlanet0->getMass()+pPlanet1->getMass())) *
+            (pPlanet1->getVelocity() - pPlanet0->getVelocity()).dot(p1p0Displacement) * p1p0Displacement;
+
+            // Update velocity
+            pPlanet0->_velocity = p0NewVel;
+            pPlanet1->_velocity = p1NewVel;
+
+            // Remove collisions
+            pPlanet1->removeCollision(pPlanet0);
+            pPlanet1->addDoesNotCollideWith(pPlanet0->getId()); 
+            pPlanet0->removeCollision(pPlanet1);
+            pPlanet0->addDoesNotCollideWith(pPlanet1->getId());
+            pPlanet0->_bNeedUpdate = true;
+            pPlanet1->_bNeedUpdate = true;
+            --i; --nCollisions;
+        }
+    }
+    return false;
+}
+
+bool solarSystem::applyGravity()
+{
+    int nObjects = _vecObjects.size();
+    for (int m = 0; m < nObjects; ++m)
+    {
+        AstroObjectBase *pObj0 = _vecObjects[m];
+        if (pObj0->_bNeedUpdate)
+        {
+            continue;
+        }
+
+        for (int i = 0; i < nObjects; ++i)
+        {
+            // Object to compare against
+            AstroObjectBase *pObj1 = _vecObjects[i];            // This could be better
+            if (pObj0->getId() == pObj1->getId())
+            {
+                // Don't interact with self
+                continue;
+            }
+
+            if (pObj0->doesNotInteractWith(pObj1->getId()))
+            {
+                continue;
+            }
+            // if (pObj0->doesNotCollideWith(pObj1->getId()))
+            // {
+            //     std::cout << "planet id " << pObj0->getId() << " and " << pObj1->getId() << " do not interact gravitationally." << std::endl;
+            //     continue;
+            // }
+
+            double obj1Mass = pObj1->getMass();
+            Eigen::Vector2d obj1Pos = pObj1->getPosition(); 
+            Eigen::Vector2d displacement = obj1Pos - pObj0->getPosition();
+            if (0 >= displacement.norm() - 1E-1)
+            {
+                std::cout << "Distance between " <<  pObj0->getId() << " and " << pObj1->getId() << 
+                " too small, ignoring gravity force. " << std::endl;
+                // return false; 
+            }
+
+            // Add gravitational force (G is arbitrary)
+            double dForce = _G * pObj0->getMass() * obj1Mass / displacement.squaredNorm();
+            Eigen::Vector2d vForce = dForce * displacement.normalized();
+            pObj0->_force += vForce;
+        }
+    }
+    
+}
+
+bool solarSystem::updateMotion()
+{
+    // Update
+    int nObjects = _vecObjects.size();
+    for (int m = 0; m < nObjects; ++m)
+    {
+        AstroObjectBase *pObj0 = _vecObjects[m];
+        pObj0->_velocity += 0.001 * pObj0->_force / pObj0->getMass();
+        pObj0->_position += 0.001 * pObj0->_velocity;
+        pObj0->_force = Eigen::Vector2d(0., 0.);
+        pObj0->_bNeedUpdate = false;
     }
 }
 

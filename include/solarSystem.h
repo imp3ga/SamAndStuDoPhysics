@@ -18,16 +18,21 @@ class solarSystem
         bool removeObject(const int nId);
         bool update();
         bool getGlVertices(std::vector<std::vector<Eigen::Vector2d>> &vecVertices);
-
+        bool updateMotion();
 
     private:
         bool checkCollisions();
+        bool resolveCollisions();
         bool removeObjects();
+        bool applyGravity();
 
         int _nPlanetIdx = 0;
         double _dRestCoef = 1.0, _dInitPlanetMass, _dInitMassDensity;
         std::vector<AstroObjectBase*> _vecObjects;
         std::vector<std::vector<AstroObjectBase*>::iterator> _vecToBeRemoved;
+
+        double _G = 1E6;
+        
 };
 
 #endif
