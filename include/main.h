@@ -1,5 +1,5 @@
 #include "include/solarSystem.h"
-#include "include/flowContainer.h"
+#include "flowSim/include/flowContainer.h"
 #include "include/tests.h"
 
 #include <vector>

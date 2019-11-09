@@ -1,4 +1,4 @@
-#include "include/fluidParticle.h"
+#include "flowSim/include/fluidParticle.h"
 #include <iostream>
 
 fluidParticle::fluidParticle(int posX, int posY, int id)

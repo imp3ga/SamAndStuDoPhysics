@@ -1,5 +1,5 @@
-#include "include/fluidParticle.h"
-#include "include/velocityField.h"
+#include "flowSim/include/fluidParticle.h"
+#include "flowSim/include/velocityField.h"
 #include <vector>
 #define CONST_PI 3.14159265358979
 #define CONST_LIFETIME 4

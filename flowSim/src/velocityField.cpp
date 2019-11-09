@@ -1,5 +1,5 @@
 
-#include "include/velocityField.h"
+#include "flowSim/include/velocityField.h"
 #include <iostream>
 
 // Eigen::Vector2d velocityField::velocitySum(Eigen::Vector2d& position, std::function<Eigen::Vector2d(Eigen::Vector2d)> func)

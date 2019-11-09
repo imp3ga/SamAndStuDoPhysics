@@ -1,6 +1,6 @@
 
 
-#include "include/flowContainer.h"
+#include "flowSim/include/flowContainer.h"
 #include <GL/freeglut.h>
 #include <iostream>
 
