@@ -29,10 +29,7 @@ class solarSystem
         int _nPlanetIdx = 0;
         double _dRestCoef = 1.0, _dInitPlanetMass, _dInitMassDensity;
         std::vector<AstroObjectBase*> _vecObjects;
-        std::vector<std::vector<AstroObjectBase*>::iterator> _vecToBeRemoved;
-
-        double _G = 1E6;
-        
+        std::vector<std::vector<AstroObjectBase*>::iterator> _vecToBeRemoved;       
 };
 
 #endif

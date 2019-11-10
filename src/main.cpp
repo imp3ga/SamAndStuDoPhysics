@@ -58,8 +58,26 @@ void mouseHandler(int button, int state, int x, int y)
   }
 }
 
+void keyHandler(unsigned char key, int x, int y)
+{
+    if(key == 'r')
+    {
+        // reset
+        _system.reset();
+    }
+    else if(key == 'c')
+    {   
+        // centre
+        _system.centre();
+    }
+    // else if(key == ' ')
+    // {
+    //     std::cout << "(" << x << ", " << y << ")\n";
+    // }
+}
+
 void runSolarSystem(int argc, char **argv){
-    _system.init(3000., _dInitMassDensity);
+    _system.init(6000., _dInitMassDensity);
 
     // openGL initialization
     glutInit(&argc, argv);
@@ -71,7 +89,7 @@ void runSolarSystem(int argc, char **argv){
     glOrtho(-_dHalfWindowWidth, _dHalfWindowWidth, -_dHalfWindowHeight, _dHalfWindowHeight, 0, 1);
     glutDisplayFunc(display);
     glutMouseFunc(mouseHandler);
-    // glutKeyboardFunc(keyHandler);
+    glutKeyboardFunc(keyHandler);
     physicsLoop(0);
 
     glutMainLoop();
